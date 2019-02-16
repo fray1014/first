@@ -14,7 +14,6 @@ namespace cam
     public partial class Form1 : Form
     {
         private Capture _capture = null;
-        private int cnt = 0;
         private bool _captureInProgress;
         public Form1()
         {
@@ -33,8 +32,17 @@ namespace cam
         private void ProcessFrame(object sender, EventArgs arg)
         {
             Image<Bgr, Byte> frame = _capture.RetrieveBgrFrame();
-            //int test = frame.[1,1,1];
-
+            Image<Gray, byte> gray_image = frame.Convert<Gray, byte>();
+            for (int i=0;i<100;i++)
+            {
+                for (int j=0;j<100;j++)
+                {
+                    Bgr temp = frame[i, j];
+                    frame[i, j] = frame[i + 100, j + 100];
+                    frame[i + 100, j + 100] = temp;
+                }
+            }
+            
             captureImageBox.Image = frame;
         }
 
@@ -56,8 +64,7 @@ namespace cam
 
                 _captureInProgress = !_captureInProgress;
             }
-            cnt++;
-            label1.Text = Convert.ToString(cnt);
+            label1.Text = Convert.ToString(_capture.QueryGrayFrame()[100,100]);
         }
 
     }
