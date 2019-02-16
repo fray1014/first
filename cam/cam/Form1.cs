@@ -14,6 +14,7 @@ namespace cam
     public partial class Form1 : Form
     {
         private Capture _capture = null;
+        private int cnt = 0;
         private bool _captureInProgress;
         public Form1()
         {
@@ -55,6 +56,9 @@ namespace cam
 
                 _captureInProgress = !_captureInProgress;
             }
+            cnt++;
+            label1.Text = Convert.ToString(cnt);
         }
+
     }
 }
