@@ -20,7 +20,7 @@ namespace cam
             InitializeComponent();
             try
             {
-                _capture = new Capture(0);//参数0表示默认摄像头，1表示外接摄像头
+                _capture = new Capture(1);//参数0表示默认摄像头，1表示外接摄像头
                 
                 _capture.ImageGrabbed += ProcessFrame;
             }
@@ -33,7 +33,7 @@ namespace cam
         {
             Image<Bgr, Byte> frame = _capture.RetrieveBgrFrame();
             Image<Gray, Byte> gray_image = frame.Convert<Gray, Byte>();
-            for (int i=0;i<100;i++)
+            /*for (int i=0;i<100;i++)
             {
                 for (int j=0;j<100;j++)
                 {
@@ -41,8 +41,8 @@ namespace cam
                     frame[i, j] = frame[i + 100, j + 100];
                     frame[i + 100, j + 100] = temp;
                 }
-            }
-            
+            }*/
+            laplacebox.Image = frame.Laplace(5);
             captureImageBox.Image = frame;
         }
 
@@ -53,7 +53,7 @@ namespace cam
                 if (_captureInProgress)
                 {  //stop the capture
                     captureButton.Text = "打开摄像头";
-                    label1.Text = Convert.ToString(_capture.QueryGrayFrame()[100, 100]);
+                    label1.Text = Convert.ToString(_capture.QueryFrame()[100, 100].Blue);
                     _capture.Pause();
                 }
                 else
@@ -64,8 +64,7 @@ namespace cam
                 }
 
                 _captureInProgress = !_captureInProgress;
-            }
-            
+            }           
         }
 
     }

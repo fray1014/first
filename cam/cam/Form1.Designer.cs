@@ -32,14 +32,16 @@
             this.captureImageBox = new Emgu.CV.UI.ImageBox();
             this.captureButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.laplacebox = new Emgu.CV.UI.ImageBox();
             ((System.ComponentModel.ISupportInitialize)(this.captureImageBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.laplacebox)).BeginInit();
             this.SuspendLayout();
             // 
             // captureImageBox
             // 
-            this.captureImageBox.Location = new System.Drawing.Point(12, 23);
+            this.captureImageBox.Location = new System.Drawing.Point(12, 6);
             this.captureImageBox.Name = "captureImageBox";
-            this.captureImageBox.Size = new System.Drawing.Size(986, 422);
+            this.captureImageBox.Size = new System.Drawing.Size(450, 450);
             this.captureImageBox.TabIndex = 2;
             this.captureImageBox.TabStop = false;
             // 
@@ -63,17 +65,27 @@
             this.label1.TabIndex = 4;
             this.label1.Text = "pixel";
             // 
+            // laplacebox
+            // 
+            this.laplacebox.Location = new System.Drawing.Point(527, 6);
+            this.laplacebox.Name = "laplacebox";
+            this.laplacebox.Size = new System.Drawing.Size(450, 450);
+            this.laplacebox.TabIndex = 2;
+            this.laplacebox.TabStop = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1009, 494);
+            this.Controls.Add(this.laplacebox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.captureButton);
             this.Controls.Add(this.captureImageBox);
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.captureImageBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.laplacebox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -84,6 +96,7 @@
         private Emgu.CV.UI.ImageBox captureImageBox;
         private System.Windows.Forms.Button captureButton;
         private System.Windows.Forms.Label label1;
+        private Emgu.CV.UI.ImageBox laplacebox;
     }
 }
 
