@@ -32,7 +32,7 @@ namespace cam
         private void ProcessFrame(object sender, EventArgs arg)
         {
             Image<Bgr, Byte> frame = _capture.RetrieveBgrFrame();
-            Image<Gray, byte> gray_image = frame.Convert<Gray, byte>();
+            Image<Gray, Byte> gray_image = frame.Convert<Gray, Byte>();
             for (int i=0;i<100;i++)
             {
                 for (int j=0;j<100;j++)
@@ -53,6 +53,7 @@ namespace cam
                 if (_captureInProgress)
                 {  //stop the capture
                     captureButton.Text = "打开摄像头";
+                    label1.Text = Convert.ToString(_capture.QueryGrayFrame()[100, 100]);
                     _capture.Pause();
                 }
                 else
@@ -64,7 +65,7 @@ namespace cam
 
                 _captureInProgress = !_captureInProgress;
             }
-            label1.Text = Convert.ToString(_capture.QueryGrayFrame()[100,100]);
+            
         }
 
     }
