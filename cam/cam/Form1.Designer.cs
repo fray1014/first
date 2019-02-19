@@ -33,8 +33,13 @@
             this.captureButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.laplacebox = new Emgu.CV.UI.ImageBox();
+            this.cannybox = new Emgu.CV.UI.ImageBox();
+            this.other = new Emgu.CV.UI.ImageBox();
+            this.canny_th = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.captureImageBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.laplacebox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cannybox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.other)).BeginInit();
             this.SuspendLayout();
             // 
             // captureImageBox
@@ -47,7 +52,7 @@
             // 
             // captureButton
             // 
-            this.captureButton.Location = new System.Drawing.Point(12, 462);
+            this.captureButton.Location = new System.Drawing.Point(12, 918);
             this.captureButton.Name = "captureButton";
             this.captureButton.Size = new System.Drawing.Size(152, 31);
             this.captureButton.TabIndex = 3;
@@ -59,7 +64,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(775, 462);
+            this.label1.Location = new System.Drawing.Point(843, 922);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(59, 20);
             this.label1.TabIndex = 4;
@@ -73,11 +78,37 @@
             this.laplacebox.TabIndex = 2;
             this.laplacebox.TabStop = false;
             // 
+            // cannybox
+            // 
+            this.cannybox.Location = new System.Drawing.Point(12, 462);
+            this.cannybox.Name = "cannybox";
+            this.cannybox.Size = new System.Drawing.Size(450, 450);
+            this.cannybox.TabIndex = 5;
+            this.cannybox.TabStop = false;
+            // 
+            // other
+            // 
+            this.other.Location = new System.Drawing.Point(527, 462);
+            this.other.Name = "other";
+            this.other.Size = new System.Drawing.Size(450, 450);
+            this.other.TabIndex = 6;
+            this.other.TabStop = false;
+            // 
+            // canny_th
+            // 
+            this.canny_th.Location = new System.Drawing.Point(443, 918);
+            this.canny_th.Name = "canny_th";
+            this.canny_th.Size = new System.Drawing.Size(100, 25);
+            this.canny_th.TabIndex = 7;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1009, 494);
+            this.ClientSize = new System.Drawing.Size(1009, 953);
+            this.Controls.Add(this.canny_th);
+            this.Controls.Add(this.other);
+            this.Controls.Add(this.cannybox);
             this.Controls.Add(this.laplacebox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.captureButton);
@@ -86,6 +117,8 @@
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.captureImageBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.laplacebox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cannybox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.other)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -97,6 +130,9 @@
         private System.Windows.Forms.Button captureButton;
         private System.Windows.Forms.Label label1;
         private Emgu.CV.UI.ImageBox laplacebox;
+        private Emgu.CV.UI.ImageBox cannybox;
+        private Emgu.CV.UI.ImageBox other;
+        private System.Windows.Forms.TextBox canny_th;
     }
 }
 

@@ -31,18 +31,21 @@ namespace cam
         }
         private void ProcessFrame(object sender, EventArgs arg)
         {
+            int th = 0;
             Image<Bgr, Byte> frame = _capture.RetrieveBgrFrame();
             Image<Gray, Byte> gray_image = frame.Convert<Gray, Byte>();
             /*for (int i=0;i<100;i++)
             {
                 for (int j=0;j<100;j++)
                 {
-                    Bgr temp = frame[i, j];
-                    frame[i, j] = frame[i + 100, j + 100];
-                    frame[i + 100, j + 100] = temp;
+                    Bgr temp=new Bgr(i+j+1,i+j+1,i+j+1);
+                    frame[i, j] = temp;
+                    //frame[i + 100, j + 100] = temp;
                 }
             }*/
             laplacebox.Image = frame.Laplace(5);
+            th=Convert.ToInt32(canny_th.Text);
+            cannybox.Image = frame.Canny(20, th);
             captureImageBox.Image = frame;
         }
 
