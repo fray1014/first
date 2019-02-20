@@ -15,13 +15,14 @@ namespace cam
     {
         private Capture _capture = null;
         private bool _captureInProgress;
+        static int th = 100;
+        static int cnt = 0;//去抖动计数器
         public Form1()
         {
             InitializeComponent();
             try
             {
-                _capture = new Capture(1);//参数0表示默认摄像头，1表示外接摄像头
-                
+                _capture = new Capture(1);//参数0表示默认摄像头，1表示外接摄像头                
                 _capture.ImageGrabbed += ProcessFrame;
             }
             catch (NullReferenceException excpt)
@@ -30,23 +31,18 @@ namespace cam
             }
         }
         private void ProcessFrame(object sender, EventArgs arg)
-        {
-            int th = 0;
+        {           
             Image<Bgr, Byte> frame = _capture.RetrieveBgrFrame();
             Image<Gray, Byte> gray_image = frame.Convert<Gray, Byte>();
-            /*for (int i=0;i<100;i++)
-            {
-                for (int j=0;j<100;j++)
-                {
-                    Bgr temp=new Bgr(i+j+1,i+j+1,i+j+1);
-                    frame[i, j] = temp;
-                    //frame[i + 100, j + 100] = temp;
-                }
-            }*/
+            if (cnt <= 100)
+                cnt++;
+            else
+                cnt = 0;
             laplacebox.Image = frame.Laplace(5);
             th=Convert.ToInt32(canny_th.Text);
             cannybox.Image = frame.Canny(20, th);
             captureImageBox.Image = frame;
+            //label1.Text = Convert.ToString(cnt);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -56,7 +52,6 @@ namespace cam
                 if (_captureInProgress)
                 {  //stop the capture
                     captureButton.Text = "打开摄像头";
-                    label1.Text = Convert.ToString(_capture.QueryFrame()[100, 100].Blue);
                     _capture.Pause();
                 }
                 else

@@ -36,6 +36,7 @@
             this.cannybox = new Emgu.CV.UI.ImageBox();
             this.other = new Emgu.CV.UI.ImageBox();
             this.canny_th = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.captureImageBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.laplacebox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cannybox)).BeginInit();
@@ -96,16 +97,27 @@
             // 
             // canny_th
             // 
-            this.canny_th.Location = new System.Drawing.Point(443, 918);
+            this.canny_th.Location = new System.Drawing.Point(443, 922);
             this.canny_th.Name = "canny_th";
             this.canny_th.Size = new System.Drawing.Size(100, 25);
             this.canny_th.TabIndex = 7;
+            this.canny_th.Text = "100";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(318, 926);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(119, 15);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Canny\'s Thresh";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1009, 953);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.canny_th);
             this.Controls.Add(this.other);
             this.Controls.Add(this.cannybox);
@@ -133,6 +145,7 @@
         private Emgu.CV.UI.ImageBox cannybox;
         private Emgu.CV.UI.ImageBox other;
         private System.Windows.Forms.TextBox canny_th;
+        private System.Windows.Forms.Label label2;
     }
 }
 
