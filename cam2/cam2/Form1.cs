@@ -15,7 +15,7 @@ namespace cam2
     {
         private static Capture _cameraCapture;
         private Image<Bgr, Byte> frame ;
-        private Image<Gray, Byte>[] canny_frame = new Image<Gray,Byte>[2];
+        private Image<Gray, Byte>[] canny_frame = new Image<Gray,Byte>[3];
         private Image<Gray, Byte> canny_out ;
         static int cnt = 0;//消抖计数器
         static int th = 100;//canny第二阈值初始化
@@ -28,7 +28,7 @@ namespace cam2
         {
             try
             {
-                _cameraCapture = new Capture(1);
+                _cameraCapture = new Capture(0);
             }
             catch (Exception e)
             {
@@ -42,13 +42,14 @@ namespace cam2
             frame = _cameraCapture.QueryFrame();
             canny_out = frame.Convert<Gray, Byte>();
             //frame._SmoothGaussian(3); //filter out noises
-            if (cnt<1)
+            if (cnt<2)
             {
                 canny_frame[cnt] = _cameraCapture.QueryFrame().Canny(50, th);
                 cnt++;
             }
             else
             {
+                int[,] eq_flag=new int[imageBox1.Height,imageBox1.Width];
                 canny_frame[cnt] = _cameraCapture.QueryFrame().Canny(50, th);
                 for(int i=0;i<imageBox1.Height;i++)
                 {
@@ -56,11 +57,31 @@ namespace cam2
                     {
                         if(canny_frame[0].Data[i,j,0]==canny_frame[1].Data[i,j,0])
                         {
-                            canny_out.Data[i, j, 0] = canny_frame[0].Data[i, j, 0];
+                            eq_flag[i, j] = 0;
+                        }
+                        else if(canny_frame[0].Data[i, j, 0] == canny_frame[2].Data[i, j, 0])
+                        {
+                            eq_flag[i, j] = 0;
+                        }
+                        else if(canny_frame[1].Data[i, j, 0] == canny_frame[2].Data[i, j, 0])
+                        {
+                            eq_flag[i, j] = 1;
                         }
                         else
                         {
-                            canny_out.Data[i, j, 0] = 0;
+                            eq_flag[i, j] = 2;
+                        }
+                        switch (eq_flag[i,j])
+                        {
+                            case 0:
+                                canny_out.Data[i, j, 0] = canny_frame[0].Data[i, j, 0];
+                                break;
+                            case 1:
+                                canny_out.Data[i, j, 0] = canny_frame[1].Data[i, j, 0];
+                                break;
+                            default:
+                                canny_out.Data[i, j, 0] = 0;
+                                break;
                         }
                     }
                 }
