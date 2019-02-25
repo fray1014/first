@@ -20,8 +20,10 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private List<MCvBox2D> tempbox = new List<MCvBox2D>();
-        private List<Rectangle> regions = new List<Rectangle>();//染色区域，regions[0]为玻片位置
+        private int size_of_slide = 100;//玻片检测大小初始化
+        private List<MCvBox2D> tempbox = new List<MCvBox2D>();//用于检测玻片位置
+        private List<Rectangle> regions = new List<Rectangle>();//染色区域
+        private Rectangle slide = new Rectangle();//玻片
         public Form1()
         {
             InitializeComponent();
@@ -31,7 +33,7 @@ namespace cam2
         {
             try
             {
-                _cameraCapture = new Capture(0);//参数0为默认摄像头，后续为外接摄像头
+                _cameraCapture = new Capture(1);//参数0为默认摄像头，后续为外接摄像头
             }
             catch (Exception e)
             {
@@ -94,20 +96,19 @@ namespace cam2
                     }
                 }
                 imageBox2.Image = canny_out;
-                microscope_detect();
+                Slide_Detection();
                 cnt = 0;
             }
         }
         /*玻片检测*/
-        void microscope_detect()
+        void Slide_Detection()
         {
-            LineSegment2D[] lines = canny_out.HoughLinesBinary(
-                1, //Distance resolution in pixel-related units
-                Math.PI / 45.0, //Angle resolution measured in radians.
-                20, //threshold
-                30, //min Line width
-                10 //gap between lines
-                )[0]; //Get the lines from the first channel
+            Rectangle_Detection();
+
+        }
+        /*矩形检测*/
+        void Rectangle_Detection()
+        {
             using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
                 for (
                    Contour<Point> contours = canny_out.FindContours(
@@ -119,8 +120,9 @@ namespace cam2
                 {
                     Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);
 
-                    if (currentContour.Area > 150) //only consider contours with area greater than 250
-                    {                       
+                    if (currentContour.Area > size_of_slide) //only consider contours with area greater than 250
+                    {
+                        Slide_Size.Text = Convert.ToString(size_of_slide);
                         if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
                         {
                             #region determine if all the angles in the contour are within [80, 100] degree
@@ -146,30 +148,37 @@ namespace cam2
                 }
             Image<Bgr, Byte> RectangleImage = frame;
             foreach (MCvBox2D box in tempbox)
-                regions.Add(box.MinAreaRect());
-            foreach (Rectangle box in regions)
                 RectangleImage.Draw(box, new Bgr(Color.DarkOrange), 2);
             imageBox3.Image = RectangleImage;
-           
         }
-        private void canny_th_up_Click(object sender, EventArgs e)
+        private void Canny_th_up_Click(object sender, EventArgs e)
         {
             th1+=5;
         }
 
-        private void canny_th_down_Click(object sender, EventArgs e)
+        private void Canny_th_down_Click(object sender, EventArgs e)
         {
             th1-=5;
         }
 
-        private void canny_th_up2_Click(object sender, EventArgs e)
+        private void Canny_th_up2_Click(object sender, EventArgs e)
         {
             th2+=5;
         }
 
-        private void canny_th_down2_Click(object sender, EventArgs e)
+        private void Canny_th_down2_Click(object sender, EventArgs e)
         {
             th2-=5;
+        }
+
+        private void Slide_Size_Up_Click(object sender, EventArgs e)
+        {
+            size_of_slide += 5;
+        }
+
+        private void Slide_Size_Down_Click(object sender, EventArgs e)
+        {
+            size_of_slide -= 5;
         }
     }
 }
