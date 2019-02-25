@@ -20,7 +20,8 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private List<MCvBox2D> regions=new List<MCvBox2D>();//染色区域，regions[0]为玻片位置
+        private List<MCvBox2D> tempbox = new List<MCvBox2D>();
+        private List<Rectangle> regions = new List<Rectangle>();//染色区域，regions[0]为玻片位置
         public Form1()
         {
             InitializeComponent();
@@ -107,7 +108,7 @@ namespace cam2
                 30, //min Line width
                 10 //gap between lines
                 )[0]; //Get the lines from the first channel
-            using (MemStorage storage = new MemStorage()) //allocate storage for contour approximation
+            using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
                 for (
                    Contour<Point> contours = canny_out.FindContours(
                       Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE,
@@ -118,9 +119,9 @@ namespace cam2
                 {
                     Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);
 
-                    if (currentContour.Area > 50) //only consider contours with area greater than 250
+                    if (currentContour.Area > 150) //only consider contours with area greater than 250
                     {                       
-                        if (currentContour.Total == 4) //The contour has 4 vertices.
+                        if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
                         {
                             #region determine if all the angles in the contour are within [80, 100] degree
                             bool isRectangle = true;
@@ -139,14 +140,17 @@ namespace cam2
                             }
                             #endregion
 
-                            if (isRectangle) regions.Add(currentContour.GetMinAreaRect());
+                            if (isRectangle) tempbox.Add(currentContour.GetMinAreaRect());
                         }
                     }
                 }
-            Image<Bgr, Byte> RectangleImage = frame.CopyBlank();
-            foreach (MCvBox2D box in regions)
+            Image<Bgr, Byte> RectangleImage = frame;
+            foreach (MCvBox2D box in tempbox)
+                regions.Add(box.MinAreaRect());
+            foreach (Rectangle box in regions)
                 RectangleImage.Draw(box, new Bgr(Color.DarkOrange), 2);
             imageBox3.Image = RectangleImage;
+           
         }
         private void canny_th_up_Click(object sender, EventArgs e)
         {
