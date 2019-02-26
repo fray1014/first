@@ -147,7 +147,7 @@
             // 
             // imageBox3
             // 
-            this.imageBox3.Location = new System.Drawing.Point(766, 535);
+            this.imageBox3.Location = new System.Drawing.Point(766, 519);
             this.imageBox3.Name = "imageBox3";
             this.imageBox3.Size = new System.Drawing.Size(720, 480);
             this.imageBox3.TabIndex = 11;

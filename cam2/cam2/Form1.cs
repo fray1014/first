@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Emgu.CV;
 using Emgu.CV.Structure;
+using Emgu.CV.CvEnum;
 using Emgu.Util;
 namespace cam2
 {
@@ -97,6 +98,7 @@ namespace cam2
                     }
                 }
                 imageBox2.Image = canny_out;
+                canny_out._Dilate(1);//形态学滤波：膨胀（3*3矩形结构元素）
                 Slide_Detection();
                 cnt = 0;
             }
@@ -121,7 +123,6 @@ namespace cam2
                    contours = contours.HNext)
                 {
                     Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);
-
                     if (currentContour.Area > size_of_slide && is_slide==false) //only consider contours with area greater than 250
                     {
                         is_slide = true;
