@@ -20,10 +20,11 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private int size_of_slide = 100;//玻片检测大小初始化
-        private List<MCvBox2D> tempbox = new List<MCvBox2D>();//用于检测玻片位置
+        private int size_of_slide = 250;//玻片检测大小初始化
+        private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
         private List<Rectangle> regions = new List<Rectangle>();//染色区域
         private Rectangle slide = new Rectangle();//玻片
+        private static bool is_slide = false;//玻片检测标志
         public Form1()
         {
             InitializeComponent();
@@ -33,7 +34,7 @@ namespace cam2
         {
             try
             {
-                _cameraCapture = new Capture(1);//参数0为默认摄像头，后续为外接摄像头
+                _cameraCapture = new Capture(0);//参数0为默认摄像头，后续为外接摄像头
             }
             catch (Exception e)
             {
@@ -104,7 +105,8 @@ namespace cam2
         void Slide_Detection()
         {
             Rectangle_Detection();
-
+            Slide_Size.Text = Convert.ToString(size_of_slide);
+            slide = tempbox.MinAreaRect();
         }
         /*矩形检测*/
         void Rectangle_Detection()
@@ -120,9 +122,9 @@ namespace cam2
                 {
                     Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);
 
-                    if (currentContour.Area > size_of_slide) //only consider contours with area greater than 250
+                    if (currentContour.Area > size_of_slide && is_slide==false) //only consider contours with area greater than 250
                     {
-                        Slide_Size.Text = Convert.ToString(size_of_slide);
+                        is_slide = true;
                         if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
                         {
                             #region determine if all the angles in the contour are within [80, 100] degree
@@ -142,13 +144,13 @@ namespace cam2
                             }
                             #endregion
 
-                            if (isRectangle) tempbox.Add(currentContour.GetMinAreaRect());
+                            //if (isRectangle) tempbox.Add(currentContour.GetMinAreaRect());
+                            if (isRectangle) tempbox=currentContour.GetMinAreaRect();
                         }
                     }
                 }
             Image<Bgr, Byte> RectangleImage = frame;
-            foreach (MCvBox2D box in tempbox)
-                RectangleImage.Draw(box, new Bgr(Color.DarkOrange), 2);
+            RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
             imageBox3.Image = RectangleImage;
         }
         private void Canny_th_up_Click(object sender, EventArgs e)
