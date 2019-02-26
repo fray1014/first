@@ -21,10 +21,11 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private int size_of_slide = 250;//玻片检测大小初始化
+        private int size_of_slide = 1000;//玻片检测大小初始化
         private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
         private List<Rectangle> regions = new List<Rectangle>();//染色区域
         private Rectangle slide = new Rectangle();//玻片
+        private Image<Gray, Byte> slide_img;
         private static bool is_slide = false;//玻片检测标志
         public Form1()
         {
@@ -98,7 +99,7 @@ namespace cam2
                     }
                 }
                 imageBox2.Image = canny_out;
-                canny_out._Dilate(1);//形态学滤波：膨胀（3*3矩形结构元素）
+                canny_out._Dilate(1);//形态学滤波：膨胀（3*3矩形结构元素），参数为迭代次数
                 Slide_Detection();
                 cnt = 0;
             }
@@ -109,6 +110,8 @@ namespace cam2
             Rectangle_Detection();
             Slide_Size.Text = Convert.ToString(size_of_slide);
             slide = tempbox.MinAreaRect();
+            slide_img =canny_out.GetSubRect(slide);
+            imageBox4.Image = slide_img;
         }
         /*矩形检测*/
         void Rectangle_Detection()

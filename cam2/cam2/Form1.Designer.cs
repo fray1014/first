@@ -44,9 +44,11 @@
             this.Slide_Size = new System.Windows.Forms.TextBox();
             this.Slide_Size_Up = new System.Windows.Forms.Button();
             this.Slide_Size_Down = new System.Windows.Forms.Button();
+            this.imageBox4 = new Emgu.CV.UI.ImageBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).BeginInit();
             this.SuspendLayout();
             // 
             // imageBox1
@@ -193,11 +195,20 @@
             this.Slide_Size_Down.UseVisualStyleBackColor = true;
             this.Slide_Size_Down.Click += new System.EventHandler(this.Slide_Size_Down_Click);
             // 
+            // imageBox4
+            // 
+            this.imageBox4.Location = new System.Drawing.Point(151, 741);
+            this.imageBox4.Name = "imageBox4";
+            this.imageBox4.Size = new System.Drawing.Size(437, 258);
+            this.imageBox4.TabIndex = 2;
+            this.imageBox4.TabStop = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1532, 1055);
+            this.Controls.Add(this.imageBox4);
             this.Controls.Add(this.Slide_Size_Down);
             this.Controls.Add(this.Slide_Size_Up);
             this.Controls.Add(this.Slide_Size);
@@ -218,6 +229,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -240,6 +252,7 @@
         private System.Windows.Forms.TextBox Slide_Size;
         private System.Windows.Forms.Button Slide_Size_Up;
         private System.Windows.Forms.Button Slide_Size_Down;
+        private Emgu.CV.UI.ImageBox imageBox4;
     }
 }
 
