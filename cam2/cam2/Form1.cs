@@ -32,6 +32,7 @@ namespace cam2
             InitializeComponent();
             Run();
         }
+
         void Run()
         {
             try
@@ -45,12 +46,13 @@ namespace cam2
             }
             Application.Idle += ProcessFrame;
         }
+
         void ProcessFrame(object sender, EventArgs e)
         {
             frame = _cameraCapture.QueryFrame();
             canny_out = frame.Convert<Gray, Byte>();
             //frame._SmoothGaussian(3); //filter out noises
-            stable_frame();           
+            stable_frame();
             imageBox1.Image = frame;           
             cannybox1.Text = Convert.ToString(th1);
             cannybox2.Text = Convert.ToString(th2);
@@ -109,7 +111,7 @@ namespace cam2
         {
             Rectangle_Detection();
             Slide_Size.Text = Convert.ToString(size_of_slide);
-            slide = tempbox.MinAreaRect();
+            slide = tempbox.MinAreaRect();//外接面积最小矩形
             slide_img =canny_out.GetSubRect(slide);
             imageBox4.Image = slide_img;
         }
@@ -125,14 +127,13 @@ namespace cam2
                    contours != null;
                    contours = contours.HNext)
                 {
-                    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);
+                    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);//逼近多边形曲线
                     if (currentContour.Area > size_of_slide && is_slide==false) //only consider contours with area greater than 250
                     {
-                        is_slide = true;
                         if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
                         {
                             #region determine if all the angles in the contour are within [80, 100] degree
-                            bool isRectangle = true;
+                            is_slide = true;
                             Point[] pts = currentContour.ToArray();
                             LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
 
@@ -142,14 +143,12 @@ namespace cam2
                                    edges[(i + 1) % edges.Length].GetExteriorAngleDegree(edges[i]));
                                 if (angle < 60 || angle > 120)
                                 {
-                                    isRectangle = false;
+                                    is_slide = false;
                                     break;
                                 }
                             }
                             #endregion
-
-                            //if (isRectangle) tempbox.Add(currentContour.GetMinAreaRect());
-                            if (isRectangle) tempbox=currentContour.GetMinAreaRect();
+                            if (is_slide) tempbox=currentContour.GetMinAreaRect();
                         }
                     }
                 }
@@ -157,6 +156,7 @@ namespace cam2
             RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
             imageBox3.Image = RectangleImage;
         }
+
         private void Canny_th_up_Click(object sender, EventArgs e)
         {
             th1+=5;
