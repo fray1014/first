@@ -21,7 +21,7 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private int size_of_slide = 1000;//玻片检测大小初始化
+        private int size_of_slide = 5000;//玻片检测大小初始化
         private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
         private List<Rectangle> regions = new List<Rectangle>();//染色区域
         private Rectangle slide = new Rectangle();//玻片
@@ -37,7 +37,7 @@ namespace cam2
         {
             try
             {
-                _cameraCapture = new Capture(0);//参数0为默认摄像头，后续为外接摄像头
+                _cameraCapture = new Capture(1);//参数0为默认摄像头，后续为外接摄像头
             }
             catch (Exception e)
             {
@@ -151,11 +151,57 @@ namespace cam2
                             if (is_slide) tempbox=currentContour.GetMinAreaRect();
                         }
                     }
+                    /*else
+                    {
+                        size_of_slide -= 50;
+                        Rectangle_Detection();
+                    }*/
                 }
             Image<Bgr, Byte> RectangleImage = frame;
             RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
             imageBox3.Image = RectangleImage;
         }
+        /*染色区域检测*/
+        /*void Region_Detection()
+        {
+            using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
+                for (
+                   Contour<Point> contours = canny_out.FindContours(
+                      Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE,
+                      Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST,
+                      storage);
+                   contours != null;
+                   contours = contours.HNext)
+                {
+                    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);//逼近多边形曲线
+                    if (currentContour.Area > size_of_slide && is_slide == false) //only consider contours with area greater than 250
+                    {
+                        if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
+                        {
+                            #region determine if all the angles in the contour are within [80, 100] degree
+                            is_slide = true;
+                            Point[] pts = currentContour.ToArray();
+                            LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
+
+                            for (int i = 0; i < edges.Length; i++)
+                            {
+                                double angle = Math.Abs(
+                                   edges[(i + 1) % edges.Length].GetExteriorAngleDegree(edges[i]));
+                                if (angle < 60 || angle > 120)
+                                {
+                                    is_slide = false;
+                                    break;
+                                }
+                            }
+                            #endregion
+                            if (is_slide) tempbox = currentContour.GetMinAreaRect();
+                        }
+                    }
+                }
+            Image<Bgr, Byte> RectangleImage = frame;
+            RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
+            imageBox3.Image = RectangleImage;
+        }*/
 
         private void Canny_th_up_Click(object sender, EventArgs e)
         {
