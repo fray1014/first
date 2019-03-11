@@ -22,10 +22,12 @@ namespace cam2
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
         private int size_of_slide = 5000;//玻片检测大小初始化
-        private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
+        private int size_of_roi = 1000;//染色区域大小初始化
+        private MCvBox2D tempbox = new MCvBox2D();//用于标注位置
         private List<Rectangle> regions = new List<Rectangle>();//染色区域
         private Rectangle slide = new Rectangle();//玻片
-        private Image<Gray, Byte> slide_img;
+        private Image<Bgr, Byte> slide_img;
+        private Image<Gray, Byte> slide_gray_img;
         private static bool is_slide = false;//玻片检测标志
         public Form1()
         {
@@ -103,6 +105,7 @@ namespace cam2
                 imageBox2.Image = canny_out;
                 canny_out._Dilate(1);//形态学滤波：膨胀（3*3矩形结构元素），参数为迭代次数
                 Slide_Detection();
+                Region_Detection();
                 cnt = 0;
             }
         }
@@ -112,7 +115,8 @@ namespace cam2
             Rectangle_Detection();
             Slide_Size.Text = Convert.ToString(size_of_slide);
             slide = tempbox.MinAreaRect();//外接面积最小矩形
-            slide_img =canny_out.GetSubRect(slide);
+            slide_img =frame.GetSubRect(slide);
+            slide_gray_img=canny_out.GetSubRect(slide);
             imageBox4.Image = slide_img;
         }
         /*矩形检测*/
@@ -151,22 +155,17 @@ namespace cam2
                             if (is_slide) tempbox=currentContour.GetMinAreaRect();
                         }
                     }
-                    /*else
-                    {
-                        size_of_slide -= 50;
-                        Rectangle_Detection();
-                    }*/
                 }
             Image<Bgr, Byte> RectangleImage = frame;
             RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
             imageBox3.Image = RectangleImage;
         }
         /*染色区域检测*/
-        /*void Region_Detection()
+        void Region_Detection()
         {
             using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
                 for (
-                   Contour<Point> contours = canny_out.FindContours(
+                   Contour<Point> contours = slide_gray_img.FindContours(
                       Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE,
                       Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST,
                       storage);
@@ -174,34 +173,15 @@ namespace cam2
                    contours = contours.HNext)
                 {
                     Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);//逼近多边形曲线
-                    if (currentContour.Area > size_of_slide && is_slide == false) //only consider contours with area greater than 250
+                    if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
                     {
-                        if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
-                        {
-                            #region determine if all the angles in the contour are within [80, 100] degree
-                            is_slide = true;
-                            Point[] pts = currentContour.ToArray();
-                            LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
-
-                            for (int i = 0; i < edges.Length; i++)
-                            {
-                                double angle = Math.Abs(
-                                   edges[(i + 1) % edges.Length].GetExteriorAngleDegree(edges[i]));
-                                if (angle < 60 || angle > 120)
-                                {
-                                    is_slide = false;
-                                    break;
-                                }
-                            }
-                            #endregion
-                            if (is_slide) tempbox = currentContour.GetMinAreaRect();
-                        }
+                        tempbox = currentContour.GetMinAreaRect();
                     }
                 }
-            Image<Bgr, Byte> RectangleImage = frame;
-            RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
+            Image<Bgr, Byte> RectangleImage = slide_img;
+            RectangleImage.Draw(tempbox, new Bgr(Color.Blue), 1);
             imageBox3.Image = RectangleImage;
-        }*/
+        }
 
         private void Canny_th_up_Click(object sender, EventArgs e)
         {
