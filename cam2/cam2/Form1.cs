@@ -20,7 +20,7 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private int size_of_slide = 15000;//玻片检测大小初始化
+        private int size_of_slide = 5000;//玻片检测大小初始化
         private List<MCvBox2D> tempbox = new List<MCvBox2D>();//用于检测玻片位置
         private List<Rectangle> regions = new List<Rectangle>();//染色区域
         private Rectangle slide = new Rectangle();//玻片
@@ -119,8 +119,8 @@ namespace cam2
                    contours != null;
                    contours = contours.HNext)
                 {
-                    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);
-
+                    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);//0.05
+                    
                     if (currentContour.Area > size_of_slide) //only consider contours with area greater than 250
                     {
                         Slide_Size.Text = Convert.ToString(size_of_slide);
