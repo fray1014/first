@@ -20,7 +20,7 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private int size_of_slide = 5000;//玻片检测大小初始化
+        private int size_of_slide = 15000;//玻片检测大小初始化
         private List<MCvBox2D> tempbox = new List<MCvBox2D>();//用于检测玻片位置
         private List<Rectangle> regions = new List<Rectangle>();//染色区域
         private Rectangle slide = new Rectangle();//玻片
@@ -33,7 +33,7 @@ namespace cam2
         {
             try
             {
-                _cameraCapture = new Capture(0);//参数0为默认摄像头，后续为外接摄像头
+                _cameraCapture = new Capture(1);//参数0为默认摄像头，后续为外接摄像头
             }
             catch (Exception e)
             {
@@ -96,6 +96,7 @@ namespace cam2
                     }
                 }
                 imageBox2.Image = canny_out;
+                canny_out.Dilate(3);
                 Slide_Detection();
                 cnt = 0;
             }
@@ -173,12 +174,12 @@ namespace cam2
 
         private void Slide_Size_Up_Click(object sender, EventArgs e)
         {
-            size_of_slide += 5;
+            size_of_slide += 50;
         }
 
         private void Slide_Size_Down_Click(object sender, EventArgs e)
         {
-            size_of_slide -= 5;
+            size_of_slide -= 50;
         }
     }
 }
