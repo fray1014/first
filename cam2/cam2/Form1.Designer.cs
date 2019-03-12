@@ -45,6 +45,11 @@
             this.Slide_Size_Up = new System.Windows.Forms.Button();
             this.Slide_Size_Down = new System.Windows.Forms.Button();
             this.imageBox4 = new Emgu.CV.UI.ImageBox();
+            this.filedir = new System.Windows.Forms.Label();
+            this.filedirbox = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.filename = new System.Windows.Forms.Label();
+            this.filenamebox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
@@ -197,17 +202,67 @@
             // 
             // imageBox4
             // 
-            this.imageBox4.Location = new System.Drawing.Point(209, 750);
+            this.imageBox4.Location = new System.Drawing.Point(418, 787);
             this.imageBox4.Name = "imageBox4";
             this.imageBox4.Size = new System.Drawing.Size(314, 226);
             this.imageBox4.TabIndex = 2;
             this.imageBox4.TabStop = false;
+            // 
+            // filedir
+            // 
+            this.filedir.AutoSize = true;
+            this.filedir.Font = new System.Drawing.Font("宋体", 12F);
+            this.filedir.Location = new System.Drawing.Point(14, 740);
+            this.filedir.Name = "filedir";
+            this.filedir.Size = new System.Drawing.Size(169, 20);
+            this.filedir.TabIndex = 16;
+            this.filedir.Text = "File\'s Location:";
+            // 
+            // filedirbox
+            // 
+            this.filedirbox.Font = new System.Drawing.Font("宋体", 12F);
+            this.filedirbox.Location = new System.Drawing.Point(189, 737);
+            this.filedirbox.Name = "filedirbox";
+            this.filedirbox.Size = new System.Drawing.Size(193, 30);
+            this.filedirbox.TabIndex = 17;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(406, 736);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(87, 31);
+            this.button1.TabIndex = 18;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // filename
+            // 
+            this.filename.AutoSize = true;
+            this.filename.Font = new System.Drawing.Font("宋体", 12F);
+            this.filename.Location = new System.Drawing.Point(14, 787);
+            this.filename.Name = "filename";
+            this.filename.Size = new System.Drawing.Size(129, 20);
+            this.filename.TabIndex = 19;
+            this.filename.Text = "File\'s Name:";
+            // 
+            // filenamebox
+            // 
+            this.filenamebox.Font = new System.Drawing.Font("宋体", 12F);
+            this.filenamebox.Location = new System.Drawing.Point(149, 784);
+            this.filenamebox.Name = "filenamebox";
+            this.filenamebox.Size = new System.Drawing.Size(233, 30);
+            this.filenamebox.TabIndex = 20;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1532, 1055);
+            this.Controls.Add(this.filenamebox);
+            this.Controls.Add(this.filename);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.filedirbox);
+            this.Controls.Add(this.filedir);
             this.Controls.Add(this.imageBox4);
             this.Controls.Add(this.Slide_Size_Down);
             this.Controls.Add(this.Slide_Size_Up);
@@ -253,6 +308,11 @@
         private System.Windows.Forms.Button Slide_Size_Up;
         private System.Windows.Forms.Button Slide_Size_Down;
         private Emgu.CV.UI.ImageBox imageBox4;
+        private System.Windows.Forms.Label filedir;
+        private System.Windows.Forms.TextBox filedirbox;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label filename;
+        private System.Windows.Forms.TextBox filenamebox;
     }
 }
 
