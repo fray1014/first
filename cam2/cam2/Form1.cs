@@ -10,6 +10,9 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.Util;
+using Newtonsoft.Json;
+using System.IO;
+
 namespace cam2
 {
     public partial class Form1 : Form
@@ -224,6 +227,62 @@ namespace cam2
         private void Slide_Size_Down_Click(object sender, EventArgs e)
         {
             size_of_slide -= 5;
+        }
+
+        public class TaskDesc
+        {
+            public string filedir;
+            public DateTime dt;
+            public int slideid;
+
+            public Rectangle rectRoi;
+            public RectangleF rectRoiF;
+            public PointF[] rectRoiPts;
+            public Size rectRoiSize;
+
+            public Rectangle rectBlk;
+            public RectangleF rectBlkF;
+            public PointF[] rectBlkPts;
+            public Size rectBlkSize;
+
+            public TaskDesc(string filedir, Rectangle rectRoi, RectangleF rectRoiF, PointF[] rectRoiPts, Size rectRoiSize,
+                                            Rectangle rectBlk, RectangleF rectBlkF, PointF[] rectBlkPts, Size rectBlkSize,
+                            int slideid)
+            {
+                this.filedir = filedir;
+                this.dt = DateTime.Now;
+                this.slideid = slideid;
+
+                this.rectRoi = rectRoi;
+                this.rectRoiF = rectRoiF;
+                this.rectRoiPts = rectRoiPts;
+                this.rectRoiSize = rectRoiSize;
+
+                this.rectBlk = rectBlk;
+                this.rectBlkF = rectBlkF;
+                this.rectBlkPts = rectBlkPts;
+                this.rectBlkSize = rectBlkSize;
+            }
+        }
+
+        public static string GenerateTaskDesc(string filedir, string filename,
+            Rectangle rectRoi, RectangleF rectRoiF, PointF[] rectRoiPts, Size rectRoiSize,
+            Rectangle rectBlk, RectangleF rectBlkF, PointF[] rectBlkPts, Size rectBlkSize, int slideid)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+            string taskdesc = Path.Combine(filedir, filename + ".dsc");
+            using (StreamWriter sw = new StreamWriter(taskdesc))
+            {
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    serializer.Serialize(jw, new TaskDesc(taskdesc,
+                        rectRoi, rectRoiF, rectRoiPts, rectRoiSize,
+                        rectBlk, rectBlkF, rectBlkPts, rectBlkSize,
+                        slideid));
+                }
+            }
+            return filedir;
         }
     }
 }
