@@ -21,10 +21,10 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private int size_of_slide = 5000;//玻片检测大小初始化
-        private int size_of_roi = 1000;//染色区域大小初始化
-        private MCvBox2D tempbox = new MCvBox2D();//用于标注位置
-        private List<Rectangle> regions = new List<Rectangle>();//染色区域
+        private int size_of_slide = 60*200;//玻片检测大小初始化
+        private int size_of_roi = 6000;//染色区域大小初始化
+        private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
+        private Rectangle roi = new Rectangle();//染色区域
         private Rectangle slide = new Rectangle();//玻片
         private Image<Bgr, Byte> slide_img;
         private Image<Gray, Byte> slide_gray_img;
@@ -34,7 +34,9 @@ namespace cam2
             InitializeComponent();
             Run();
         }
-
+        //Backgroundworker多线程
+        //System.thread多线程
+        //visual assistant X查看代码工具
         void Run()
         {
             try
@@ -54,13 +56,13 @@ namespace cam2
             frame = _cameraCapture.QueryFrame();
             canny_out = frame.Convert<Gray, Byte>();
             //frame._SmoothGaussian(3); //filter out noises
-            stable_frame();
+            Stable_Frame();
             imageBox1.Image = frame;           
             cannybox1.Text = Convert.ToString(th1);
             cannybox2.Text = Convert.ToString(th2);
         }
         /*动态消抖*/
-        void stable_frame()
+        void Stable_Frame()//传参Image<Gray, Byte> image
         {
             if (cnt < 2)
             {
@@ -113,11 +115,16 @@ namespace cam2
         void Slide_Detection()
         {
             Rectangle_Detection();
-            Slide_Size.Text = Convert.ToString(size_of_slide);
-            slide = tempbox.MinAreaRect();//外接面积最小矩形
-            slide_img =frame.GetSubRect(slide);
-            slide_gray_img=canny_out.GetSubRect(slide);
-            imageBox4.Image = slide_img;
+            if(is_slide)
+            {
+                slide = tempbox.MinAreaRect();//外接面积最小矩形
+                slide_img = frame.GetSubRect(slide);
+                slide_gray_img = canny_out.GetSubRect(slide);
+                imageBox4.Image = slide_img;
+                is_slide = false;
+            }
+            else
+                Slide_Detection();
         }
         /*矩形检测*/
         void Rectangle_Detection()
@@ -137,7 +144,6 @@ namespace cam2
                         if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
                         {
                             #region determine if all the angles in the contour are within [80, 100] degree
-                            is_slide = true;
                             Point[] pts = currentContour.ToArray();
                             LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
 
@@ -145,24 +151,29 @@ namespace cam2
                             {
                                 double angle = Math.Abs(
                                    edges[(i + 1) % edges.Length].GetExteriorAngleDegree(edges[i]));
-                                if (angle < 60 || angle > 120)
+                                if (angle >= 60 || angle <= 120)
                                 {
-                                    is_slide = false;
+                                    is_slide = true;
                                     break;
                                 }
                             }
                             #endregion
-                            if (is_slide) tempbox=currentContour.GetMinAreaRect();
+                            if (is_slide)
+                            {
+                                Slide_Size.Text = Convert.ToString(size_of_slide);
+                                tempbox = currentContour.GetMinAreaRect();
+                                Image<Bgr, Byte> RectangleImage = frame;
+                                RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
+                                imageBox3.Image = RectangleImage;
+                                break;
+                            }
                         }
                     }
                 }
-            Image<Bgr, Byte> RectangleImage = frame;
-            RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
-            imageBox3.Image = RectangleImage;
         }
-        /*染色区域检测*/
+        /*ROI检测*/
         void Region_Detection()
-        {
+        { 
             using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
                 for (
                    Contour<Point> contours = slide_gray_img.FindContours(
@@ -176,11 +187,13 @@ namespace cam2
                     if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
                     {
                         tempbox = currentContour.GetMinAreaRect();
+                        Image<Bgr, Byte> RectangleImage = slide_img;
+                        RectangleImage.Draw(tempbox, new Bgr(Color.Blue), 1);
+                        roi = tempbox.MinAreaRect();
+                        imageBox4.Image = RectangleImage;
+                        break;
                     }
                 }
-            Image<Bgr, Byte> RectangleImage = slide_img;
-            RectangleImage.Draw(tempbox, new Bgr(Color.Blue), 1);
-            imageBox3.Image = RectangleImage;
         }
 
         private void Canny_th_up_Click(object sender, EventArgs e)

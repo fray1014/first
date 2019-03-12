@@ -197,9 +197,9 @@
             // 
             // imageBox4
             // 
-            this.imageBox4.Location = new System.Drawing.Point(151, 741);
+            this.imageBox4.Location = new System.Drawing.Point(209, 750);
             this.imageBox4.Name = "imageBox4";
-            this.imageBox4.Size = new System.Drawing.Size(437, 258);
+            this.imageBox4.Size = new System.Drawing.Size(314, 226);
             this.imageBox4.TabIndex = 2;
             this.imageBox4.TabStop = false;
             // 
