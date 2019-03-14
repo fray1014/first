@@ -88,7 +88,7 @@ namespace cam2
             else
             {
                 int[,] eq_flag = new int[imageBox1.Height, imageBox1.Width];
-                canny_frame[cnt] = _cameraCapture.QueryFrame().Canny(th1, th2);
+                canny_frame[cnt] = frame.Canny(th1, th2);
                 for (int i = 0; i < imageBox1.Height; i++)
                 {
                     for (int j = 0; j < imageBox1.Width; j++)
@@ -159,11 +159,12 @@ namespace cam2
                    contours = contours.HNext)
                 {
                     Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);//逼近多边形曲线
-                    if (currentContour.Area > size_of_slide && isSlide==false) //only consider contours with area greater than 250
+                    if (currentContour.Area > size_of_slide  && isSlide == false) //only consider contours with area greater than 250
                     {
                         if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
                         {
                             #region determine if all the angles in the contour are within [80, 100] degree
+                            bool isRectangle = false;
                             Point[] pts = currentContour.ToArray();
                             LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
 
@@ -622,7 +623,10 @@ namespace cam2
             {
                 MessageBox.Show("请选择物镜倍数", "Message");
             }
-            
+            else if (!filedirChoose)
+            {
+                MessageBox.Show("请选择保存路径", "Message");
+            }
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
