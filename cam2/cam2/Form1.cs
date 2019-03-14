@@ -25,13 +25,25 @@ namespace cam2
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
         private int size_of_slide = 60*200;//玻片检测大小初始化
-        private int size_of_roi = 6000;//染色区域大小初始化
+        private int size_of_roi = 8000;//染色区域大小初始化
         private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
         private Rectangle roi = new Rectangle();//染色区域
         private Rectangle slide = new Rectangle();//玻片
         private Image<Bgr, Byte> slide_img;
         private Image<Gray, Byte> slide_gray_img;
-        private static bool is_slide = false;//玻片检测标志
+        private static bool isSlide = false;//玻片检测标志
+        private static bool scanDone = false;//扫描结束标志位
+        private static bool ampChoose = false;
+        private static bool filedirChoose = false;
+        private string fileDir;
+        private int position = 0;//玻片位置
+        private int amp = 1;//物镜倍数
+
+        public static Rectangle rect1stBLK = new Rectangle(125, 115, 150, 30);
+        public static Rectangle rect2ndBLK = new Rectangle(525, 115, 150, 30);
+        public static Rectangle rect3rdBLK = new Rectangle(925, 115, 150, 30);
+        public static Rectangle rect4thBLK = new Rectangle(1325, 115, 150, 30);
+        public static Rectangle[] rectsBLK = { rect1stBLK, rect2ndBLK, rect3rdBLK , rect4thBLK };
         public Form1()
         {
             InitializeComponent();
@@ -60,16 +72,17 @@ namespace cam2
             canny_out = frame.Convert<Gray, Byte>();
             //frame._SmoothGaussian(3); //filter out noises
             Stable_Frame();
-            imageBox1.Image = frame;           
+            imageBox1.Image = frame;
             cannybox1.Text = Convert.ToString(th1);
             cannybox2.Text = Convert.ToString(th2);
+
         }
         /*动态消抖*/
         void Stable_Frame()//传参Image<Gray, Byte> image
         {
             if (cnt < 2)
             {
-                canny_frame[cnt] = _cameraCapture.QueryFrame().Canny(th1, th2);
+                canny_frame[cnt] = frame.Canny(th1, th2);
                 cnt++;
             }
             else
@@ -107,6 +120,7 @@ namespace cam2
                         }
                     }
                 }
+                
                 imageBox2.Image = canny_out;
                 canny_out._Dilate(1);//形态学滤波：膨胀（3*3矩形结构元素），参数为迭代次数
                 Slide_Detection();
@@ -118,16 +132,19 @@ namespace cam2
         void Slide_Detection()
         {
             Rectangle_Detection();
-            if(is_slide)
+            if(isSlide)
             {
                 slide = tempbox.MinAreaRect();//外接面积最小矩形
                 slide_img = frame.GetSubRect(slide);
                 slide_gray_img = canny_out.GetSubRect(slide);
                 imageBox4.Image = slide_img;
-                is_slide = false;
+                isSlide = false;
             }
             else
+            {
                 Slide_Detection();
+            }
+ 
         }
         /*矩形检测*/
         void Rectangle_Detection()
@@ -142,7 +159,7 @@ namespace cam2
                    contours = contours.HNext)
                 {
                     Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);//逼近多边形曲线
-                    if (currentContour.Area > size_of_slide && is_slide==false) //only consider contours with area greater than 250
+                    if (currentContour.Area > size_of_slide && isSlide==false) //only consider contours with area greater than 250
                     {
                         if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
                         {
@@ -156,12 +173,12 @@ namespace cam2
                                    edges[(i + 1) % edges.Length].GetExteriorAngleDegree(edges[i]));
                                 if (angle >= 60 || angle <= 120)
                                 {
-                                    is_slide = true;
+                                    isSlide = true;
                                     break;
                                 }
                             }
                             #endregion
-                            if (is_slide)
+                            if (isSlide)
                             {
                                 Slide_Size.Text = Convert.ToString(size_of_slide);
                                 tempbox = currentContour.GetMinAreaRect();
@@ -190,11 +207,15 @@ namespace cam2
                     if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
                     {
                         tempbox = currentContour.GetMinAreaRect();
-                        Image<Bgr, Byte> RectangleImage = slide_img;
-                        RectangleImage.Draw(tempbox, new Bgr(Color.Blue), 1);
                         roi = tempbox.MinAreaRect();
-                        imageBox4.Image = RectangleImage;
-                        break;
+                        if(roi.Width>=10 && roi.Height>=10)
+                        {
+                            Image<Bgr, Byte> RectangleImage = slide_img;
+                            RectangleImage.Draw(tempbox, new Bgr(Color.Blue), 2);
+                            imageBox4.Image = RectangleImage;
+                            scanDone = true;
+                            break;
+                        }
                     }
                 }
         }
@@ -265,13 +286,279 @@ namespace cam2
             }
         }
 
-        public static string GenerateTaskDesc(string filedir, string filename,
+        public class RectConverter
+        {
+
+            static public string[] eyepieces = new string[4] { "10x", "20x", "40x", "100x" };
+            static public int[] ieyepieces = new int[4] { 10, 20, 40, 100 };
+            static public float xstep_20x = 0.32F;
+            static public float ystep_20x = 0.23F;
+            static public float xstep_40x = 0.15F;
+            static public float ystep_40x = 0.11F;
+
+            static public Rectangle rect1st = new Rectangle(77, 77, 247, 500);
+            static public Rectangle rect2nd = new Rectangle(477, 77, 247, 500);
+            static public Rectangle rect3rd = new Rectangle(877, 77, 247, 500);
+            static public Rectangle rect4th = new Rectangle(1277, 77, 247, 500);
+
+            static public Rectangle rect1stROI = new Rectangle(77, 227, 247, 250);
+            static public Rectangle rect2ndROI = new Rectangle(477, 227, 247, 250);
+            static public Rectangle rect3rdROI = new Rectangle(877, 227, 247, 250);
+            static public Rectangle rect4thROI = new Rectangle(1277, 227, 247, 250);
+
+
+            /* 原始数据
+            public PointF lu1 = new PointF(121.689F, 73.5981F);
+            public PointF ld1 = new PointF(121.66F, 27.1874F);
+            public PointF rd1 = new PointF(96.5164F, 27.236F);
+            public PointF ru1 = new PointF(96.3882F, 76.8784F);
+
+            public PointF lu2 = new PointF(93.3491F, 74.125F);
+            public PointF ld2 = new PointF(93.3599F, 27.1964F);
+            public PointF rd2 = new PointF(68.2347F, 27.252F);
+            public PointF ru2 = new PointF(68.0632F, 75.0527F);
+            */
+
+            // 修正数据
+            static public PointF lu1 = new PointF(121.5014F, 67.9150F);
+            static public PointF ld1 = new PointF(121.5014F, 21.5745F);
+            static public PointF rd1 = new PointF(96.5038F, 21.5745F);
+            static public PointF ru1 = new PointF(96.5038F, 67.9150F);
+
+            static public PointF lu2 = new PointF(93.1812F, 67.9150F);
+            static public PointF ld2 = new PointF(93.1812F, 21.5745F);
+            static public PointF rd2 = new PointF(69.2115F, 21.5745F);
+            static public PointF ru2 = new PointF(69.2115F, 67.9150F);
+
+            static public PointF lu3 = new PointF(64.8728F, 67.9150F);
+            static public PointF ld3 = new PointF(64.8728F, 21.5745F);
+            static public PointF rd3 = new PointF(39.9191F, 21.5745F);
+            static public PointF ru3 = new PointF(39.9191F, 67.9150F);
+
+            static public PointF lu4 = new PointF(34.3033F, 67.9150F);
+            static public PointF ld4 = new PointF(34.3033F, 21.5745F);
+            static public PointF rd4 = new PointF(11.6354F, 21.5745F);
+            static public PointF ru4 = new PointF(11.6354F, 67.9150F);
+
+            static public RectangleF frect1st = new RectangleF(rd1, new SizeF(Math.Abs(ru1.X - lu1.X), Math.Abs(rd1.Y - ru1.Y)));
+            static public RectangleF frect2nd = new RectangleF(rd2, new SizeF(Math.Abs(ru2.X - lu2.X), Math.Abs(rd2.Y - ru2.Y)));
+            static public RectangleF frect3rd = new RectangleF(rd3, new SizeF(Math.Abs(ru3.X - lu3.X), Math.Abs(rd3.Y - ru3.Y)));
+            static public RectangleF frect4th = new RectangleF(rd4, new SizeF(Math.Abs(ru4.X - lu4.X), Math.Abs(rd4.Y - ru4.Y)));
+
+            static public RectangleF[] frects = new RectangleF[4] {
+            frect1st, frect2nd, frect3rd, frect4th
+        };
+
+            static public Rectangle[] rects = new Rectangle[4] {
+            rect1st, rect2nd, rect3rd, rect4th
+        };
+
+            public static RectangleF ConvertFromDrawRect(Rectangle rectangle, int idx)
+            {
+                float xratio = (float)(Math.Abs(rectangle.X - rects[idx].X)) / (float)rects[idx].Width;
+                float yratio = (float)(Math.Abs(rectangle.Y - rects[idx].Y)) / (float)rects[idx].Height;
+                float wratio = (float)rectangle.Width / (float)rects[idx].Width;
+                float hratio = (float)rectangle.Height / (float)rects[idx].Height;
+
+                float x, y, w, h;
+                x = frects[idx].X + frects[idx].Width * (1.0F - xratio);
+                y = frects[idx].Y + frects[idx].Height * (1.0F - yratio);
+                w = frects[idx].Width * wratio;
+                h = frects[idx].Height * hratio;
+
+                return new RectangleF(x, y, w, h);
+            }
+
+            public static Rectangle ConvertToDrawRect(RectangleF frectangle, int idx)
+            {
+
+                Rectangle retRect = rects[idx];
+
+                float xratio = (Math.Abs(frectangle.X + frects[idx].Width - frects[idx].X)) / frects[idx].Width;
+                float yratio = (Math.Abs(frectangle.Y - frects[idx].Y)) / frects[idx].Height;
+                float wratio = frectangle.Width / frects[idx].Width;
+                float hratio = frectangle.Height / frects[idx].Height;
+
+                retRect.X = Convert.ToInt32(rects[idx].X - rects[idx].Width * xratio);
+                retRect.Y = Convert.ToInt32(rects[idx].Y + rects[idx].Height * yratio);
+                retRect.Width = Convert.ToInt32(rects[idx].Width * wratio);
+                retRect.Height = Convert.ToInt32(rects[idx].Height * hratio);
+
+                return retRect;
+            }
+
+            public static Size GetStepsByRectangleF(RectangleF frectangle, int amp)
+            {
+                float x_step = 0.0F;
+                float y_step = 0.0F;
+
+                if (amp == 1)
+                {
+                    x_step = xstep_20x;
+                    y_step = ystep_20x;
+                }
+                else if (amp == 2)
+                {
+                    x_step = xstep_40x;
+                    y_step = ystep_40x;
+                }
+
+                Size size = new Size();
+                size.Width = Convert.ToInt32(frectangle.Width / x_step);
+                size.Height = Convert.ToInt32(frectangle.Height / y_step);
+                return size;
+            }
+
+
+            public static PointF[] GetAllPointsByRectangleF(RectangleF frectangle, int amp)
+            {
+                float x_step = 0.0F;
+                float y_step = 0.0F;
+
+                if (amp == 1)
+                {
+                    x_step = xstep_20x;
+                    y_step = ystep_20x;
+                }
+                else if (amp == 2)
+                {
+                    x_step = xstep_40x;
+                    y_step = ystep_40x;
+                }
+
+                Size size = GetStepsByRectangleF(frectangle, amp);
+                PointF[] points = new PointF[size.Width * size.Height];
+                PointF stP = new PointF(frectangle.X, frectangle.Y);
+                Int32 xstep = 1;
+                Int32 x = 0;
+                Int32 ptr = 0;
+
+                foreach (Int32 y in Enumerable.Range(0, size.Height))
+                {
+
+                    if (y % 2 == 1)
+                    {
+                        x = 0; xstep = 1;
+                    }
+                    else
+                    {
+                        x = size.Width - 1; xstep = -1;
+                    }
+                    foreach (Int32 u in Enumerable.Range(0, size.Width))
+                    {
+                        PointF pt = new PointF(stP.X - x * x_step, stP.Y + y * y_step);
+                        points[ptr] = pt;
+                        ptr++;
+                        x = x + xstep;
+                    }
+                }
+                return points;
+            }
+
+            public static Point ConvertPointFToPoint(Rectangle rect, RectangleF frect, PointF pt)
+            {
+                Point ipt = new Point();
+                ipt.X = Convert.ToInt32(rect.X + rect.Width * ((frect.X - pt.X) / frect.Width));
+                ipt.Y = Convert.ToInt32(rect.Y + rect.Height * ((frect.Y - pt.Y) / frect.Height));
+                return ipt;
+            }
+
+            public class TaskDesc
+            {
+                public string filedir;
+                public DateTime dt;
+                public int slideid;
+
+                public Rectangle rectRoi;
+                public RectangleF rectRoiF;
+                public PointF[] rectRoiPts;
+                public Size rectRoiSize;
+
+                public Rectangle rectBlk;
+                public RectangleF rectBlkF;
+                public PointF[] rectBlkPts;
+                public Size rectBlkSize;
+
+                public TaskDesc(string filedir, Rectangle rectRoi, RectangleF rectRoiF, PointF[] rectRoiPts, Size rectRoiSize,
+                                                Rectangle rectBlk, RectangleF rectBlkF, PointF[] rectBlkPts, Size rectBlkSize,
+                                int slideid)
+                {
+                    this.filedir = filedir;
+                    this.dt = DateTime.Now;
+                    this.slideid = slideid;
+
+                    this.rectRoi = rectRoi;
+                    this.rectRoiF = rectRoiF;
+                    this.rectRoiPts = rectRoiPts;
+                    this.rectRoiSize = rectRoiSize;
+
+                    this.rectBlk = rectBlk;
+                    this.rectBlkF = rectBlkF;
+                    this.rectBlkPts = rectBlkPts;
+                    this.rectBlkSize = rectBlkSize;
+                }
+            }
+
+            public static string GenerateTaskDesc(string filedir, string filename,
+                Rectangle rectRoi, RectangleF rectRoiF, PointF[] rectRoiPts, Size rectRoiSize,
+                Rectangle rectBlk, RectangleF rectBlkF, PointF[] rectBlkPts, Size rectBlkSize, int slideid)
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.NullValueHandling = NullValueHandling.Ignore;
+                string taskdesc = Path.Combine(filedir, filename + ".dsc");
+                using (StreamWriter sw = new StreamWriter(taskdesc))
+                {
+                    using (JsonWriter jw = new JsonTextWriter(sw))
+                    {
+                        serializer.Serialize(jw, new TaskDesc(taskdesc,
+                            rectRoi, rectRoiF, rectRoiPts, rectRoiSize,
+                            rectBlk, rectBlkF, rectBlkPts, rectBlkSize,
+                            slideid));
+                    }
+                }
+                return filedir;
+            }
+
+            public static string GenerateTaskDesc(string filedir, string filename, TaskDesc tdsc)
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.NullValueHandling = NullValueHandling.Ignore;
+                string taskdesc = Path.Combine(filedir, filename + ".dsc");
+                using (StreamWriter sw = new StreamWriter(taskdesc))
+                {
+                    using (JsonWriter jw = new JsonTextWriter(sw))
+                    {
+                        serializer.Serialize(jw, new TaskDesc(taskdesc,
+                            tdsc.rectRoi, tdsc.rectRoiF, tdsc.rectRoiPts, tdsc.rectRoiSize,
+                            tdsc.rectBlk, tdsc.rectBlkF, tdsc.rectBlkPts, tdsc.rectBlkSize,
+                            tdsc.slideid));
+                    }
+                }
+                return filedir;
+            }
+
+            public static TaskDesc RestoreTaskDesc(string taskdesc)
+            {
+                TaskDesc tdsc;
+
+                using (StreamReader sw = new StreamReader(taskdesc))
+                {
+                    tdsc = JsonConvert.DeserializeObject<TaskDesc>(sw.ReadToEnd());
+                }
+
+                return tdsc;
+            }
+
+
+        }
+
+        void GenerateTaskDesc(string filedir,
             Rectangle rectRoi, RectangleF rectRoiF, PointF[] rectRoiPts, Size rectRoiSize,
             Rectangle rectBlk, RectangleF rectBlkF, PointF[] rectBlkPts, Size rectBlkSize, int slideid)
         {
             JsonSerializer serializer = new JsonSerializer();
             serializer.NullValueHandling = NullValueHandling.Ignore;
-            string taskdesc = Path.Combine(filedir, filename + ".dsc");
+            string taskdesc = Path.Combine(filedir + ".dsc");
             using (StreamWriter sw = new StreamWriter(taskdesc))
             {
                 using (JsonWriter jw = new JsonTextWriter(sw))
@@ -282,7 +569,75 @@ namespace cam2
                         slideid));
                 }
             }
-            return filedir;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog();
+            fileDialog.ShowDialog();
+            this.filedirBox.Text= fileDialog.FileName;
+            fileDir = fileDialog.FileName;
+            filedirChoose = true;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if(scanDone && ampChoose && filedirChoose)
+            {
+                RectangleF rectFRoiRecord;
+                PointF[] rectFRoiPoints;
+                Size rectRoiSize;
+
+                RectangleF rectFBlkRecord;
+                Rectangle rectBlkRecord;
+                PointF[] rectFBlkPoints;
+                Size rectBlkSize;
+
+                rectFRoiRecord = RectConverter.ConvertFromDrawRect(roi, position);
+                rectFRoiPoints = RectConverter.GetAllPointsByRectangleF(rectFRoiRecord, amp);
+                rectRoiSize = RectConverter.GetStepsByRectangleF(rectFRoiRecord, amp);
+
+                rectBlkRecord = rectsBLK[position];
+                rectFBlkRecord = RectConverter.ConvertFromDrawRect(rectsBLK[position], position);
+                // Cal two Points.
+                rectFBlkPoints = new PointF[2];
+                rectFBlkPoints[0] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
+                rectFBlkPoints[1] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width * 2 / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
+                rectBlkSize = RectConverter.GetStepsByRectangleF(rectFBlkRecord, amp);
+
+                GenerateTaskDesc(fileDir,roi, rectFRoiRecord, rectFRoiPoints, rectRoiSize,
+                                rectBlkRecord, rectFBlkRecord, rectFBlkPoints, rectBlkSize,
+                                position);
+                scanDone = false;
+                filedirChoose = false;
+                ampChoose = false;
+                isSlide = false;
+                MessageBox.Show("扫描完成", "Message");
+            }
+            else if(!scanDone)
+            {
+                MessageBox.Show("请等待完成扫描","Message");
+            }
+            else if(!ampChoose)
+            {
+                MessageBox.Show("请选择物镜倍数", "Message");
+            }
+            
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch(comboBox1.SelectedIndex)
+            {
+                case 0://20x
+                    amp = 1;
+                    ampChoose = true;
+                    break;
+                case 1://40x
+                    amp = 2;
+                    ampChoose = true;
+                    break;
+            }
         }
     }
 }

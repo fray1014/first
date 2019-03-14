@@ -46,10 +46,11 @@
             this.Slide_Size_Down = new System.Windows.Forms.Button();
             this.imageBox4 = new Emgu.CV.UI.ImageBox();
             this.filedir = new System.Windows.Forms.Label();
-            this.filedirbox = new System.Windows.Forms.TextBox();
+            this.filedirBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.filename = new System.Windows.Forms.Label();
-            this.filenamebox = new System.Windows.Forms.TextBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
@@ -168,7 +169,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(236, 34);
             this.label3.TabIndex = 12;
-            this.label3.Text = "Slide\'s_Size:";
+            this.label3.Text = "Slide\'s Size:";
             // 
             // Slide_Size
             // 
@@ -202,7 +203,7 @@
             // 
             // imageBox4
             // 
-            this.imageBox4.Location = new System.Drawing.Point(418, 787);
+            this.imageBox4.Location = new System.Drawing.Point(12, 796);
             this.imageBox4.Name = "imageBox4";
             this.imageBox4.Size = new System.Drawing.Size(314, 226);
             this.imageBox4.TabIndex = 2;
@@ -214,54 +215,73 @@
             this.filedir.Font = new System.Drawing.Font("宋体", 12F);
             this.filedir.Location = new System.Drawing.Point(14, 740);
             this.filedir.Name = "filedir";
-            this.filedir.Size = new System.Drawing.Size(169, 20);
+            this.filedir.Size = new System.Drawing.Size(149, 20);
             this.filedir.TabIndex = 16;
-            this.filedir.Text = "File\'s Location:";
+            this.filedir.Text = "文件保存路径：";
             // 
-            // filedirbox
+            // filedirBox
             // 
-            this.filedirbox.Font = new System.Drawing.Font("宋体", 12F);
-            this.filedirbox.Location = new System.Drawing.Point(189, 737);
-            this.filedirbox.Name = "filedirbox";
-            this.filedirbox.Size = new System.Drawing.Size(193, 30);
-            this.filedirbox.TabIndex = 17;
+            this.filedirBox.Font = new System.Drawing.Font("宋体", 12F);
+            this.filedirBox.Location = new System.Drawing.Point(158, 737);
+            this.filedirBox.Name = "filedirBox";
+            this.filedirBox.Size = new System.Drawing.Size(475, 30);
+            this.filedirBox.TabIndex = 17;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(406, 736);
+            this.button1.Location = new System.Drawing.Point(639, 736);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(87, 31);
+            this.button1.Size = new System.Drawing.Size(43, 31);
             this.button1.TabIndex = 18;
-            this.button1.Text = "button1";
+            this.button1.Text = "...";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // filename
+            // button2
             // 
-            this.filename.AutoSize = true;
-            this.filename.Font = new System.Drawing.Font("宋体", 12F);
-            this.filename.Location = new System.Drawing.Point(14, 787);
-            this.filename.Name = "filename";
-            this.filename.Size = new System.Drawing.Size(129, 20);
-            this.filename.TabIndex = 19;
-            this.filename.Text = "File\'s Name:";
+            this.button2.Font = new System.Drawing.Font("宋体", 12F);
+            this.button2.Location = new System.Drawing.Point(507, 856);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(90, 41);
+            this.button2.TabIndex = 19;
+            this.button2.Text = "确认";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // filenamebox
+            // label4
             // 
-            this.filenamebox.Font = new System.Drawing.Font("宋体", 12F);
-            this.filenamebox.Location = new System.Drawing.Point(149, 784);
-            this.filenamebox.Name = "filenamebox";
-            this.filenamebox.Size = new System.Drawing.Size(233, 30);
-            this.filenamebox.TabIndex = 20;
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("宋体", 12F);
+            this.label4.Location = new System.Drawing.Point(361, 796);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(109, 20);
+            this.label4.TabIndex = 20;
+            this.label4.Text = "物镜倍数：";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.Font = new System.Drawing.Font("宋体", 12F);
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "20x",
+            "40x"});
+            this.comboBox1.Location = new System.Drawing.Point(476, 793);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 28);
+            this.comboBox1.TabIndex = 21;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1532, 1055);
-            this.Controls.Add(this.filenamebox);
-            this.Controls.Add(this.filename);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.filedirbox);
+            this.Controls.Add(this.filedirBox);
             this.Controls.Add(this.filedir);
             this.Controls.Add(this.imageBox4);
             this.Controls.Add(this.Slide_Size_Down);
@@ -309,10 +329,11 @@
         private System.Windows.Forms.Button Slide_Size_Down;
         private Emgu.CV.UI.ImageBox imageBox4;
         private System.Windows.Forms.Label filedir;
-        private System.Windows.Forms.TextBox filedirbox;
+        private System.Windows.Forms.TextBox filedirBox;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label filename;
-        private System.Windows.Forms.TextBox filenamebox;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }
 
