@@ -87,8 +87,9 @@ namespace cam2
             canny_out = frame.Convert<Gray, Byte>();
             //frame._SmoothGaussian(3); //filter out noises
             if(startFlag)
-            {
-                Stable_Frame();
+            { 
+                Slide_Detection();
+                Region_Detection();
             }
             else
             {
@@ -104,6 +105,7 @@ namespace cam2
         /*动态消抖*/
         void Stable_Frame()//传参Image<Gray, Byte> image
         {
+            frame = _cameraCapture.QueryFrame();
             imageBox1.Image = frame;
             cannyBox1.Text = Convert.ToString(th1);
             cannyBox2.Text = Convert.ToString(th2);
@@ -148,17 +150,15 @@ namespace cam2
                         }
                     }
                 }
-                
                 imageBox2.Image = canny_out;
                 canny_out._Dilate(1);//形态学滤波：膨胀（3*3矩形结构元素），参数为迭代次数
-                Slide_Detection();
-                Region_Detection();
                 cnt = 0;
             }
         }
         /*玻片检测*/
         void Slide_Detection()
         {
+            Stable_Frame();
             Rectangle_Detection();
             if(isSlide)
             {
@@ -177,6 +177,7 @@ namespace cam2
         /*矩形检测*/
         void Rectangle_Detection()
         {
+            
             using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
                 for (
                    Contour<Point> contours = canny_out.FindContours(
@@ -648,6 +649,7 @@ namespace cam2
                 filedirChoose = false;
                 ampChoose = false;
                 isSlide = false;
+                startFlag = false;
                 MessageBox.Show("扫描完成", "Message");
             }
             else if(!scanDone)
