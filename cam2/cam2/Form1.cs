@@ -24,8 +24,8 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private int size_of_slide = 60*200;//玻片检测大小初始化
-        private int size_of_roi = 8000;//染色区域大小初始化
+        private int size_of_slide = 50*180;//玻片检测大小初始化
+        private int size_of_roi = 1100;//染色区域大小初始化
         private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
         private Rectangle roi = new Rectangle();//染色区域
         private Rectangle slide = new Rectangle();//玻片
@@ -35,6 +35,7 @@ namespace cam2
         private static bool scanDone = false;//扫描结束标志位
         private static bool ampChoose = false;
         private static bool filedirChoose = false;
+        private static bool startFlag = false;
         private string fileDir;
         private int position = 0;//玻片位置
         private int amp = 1;//物镜倍数
@@ -56,7 +57,21 @@ namespace cam2
         {
             try
             {
-                _cameraCapture = new Capture(1);//参数0为默认摄像头，后续为外接摄像头
+                //参数0为默认摄像头，后续为外接摄像头
+                _cameraCapture = new Capture(1);
+
+                canThBar1.Maximum = 255;
+                canThBar1.Minimum = 0;
+                canThBar1.SmallChange = 2;
+
+                canThBar2.Maximum = 255;
+                canThBar2.Minimum = 0;
+                canThBar2.SmallChange = 2;
+
+                slideSizeBar.Maximum = 200 * 200;
+                slideSizeBar.Minimum = 1000;
+                slideSizeBar.SmallChange = 500;
+
             }
             catch (Exception e)
             {
@@ -71,15 +86,28 @@ namespace cam2
             frame = _cameraCapture.QueryFrame();
             canny_out = frame.Convert<Gray, Byte>();
             //frame._SmoothGaussian(3); //filter out noises
-            Stable_Frame();
-            imageBox1.Image = frame;
-            cannybox1.Text = Convert.ToString(th1);
-            cannybox2.Text = Convert.ToString(th2);
-
+            if(startFlag)
+            {
+                Stable_Frame();
+            }
+            else
+            {
+                canThBar1.Value = th1;
+                canThBar2.Value = th2;
+                slideSizeBar.Value = size_of_slide;
+                imageBox1.Image = frame;
+                cannyBox1.Text = Convert.ToString(th1);
+                cannyBox2.Text = Convert.ToString(th2);
+                slideSize.Text = Convert.ToString(size_of_slide);
+            }
         }
         /*动态消抖*/
         void Stable_Frame()//传参Image<Gray, Byte> image
         {
+            imageBox1.Image = frame;
+            cannyBox1.Text = Convert.ToString(th1);
+            cannyBox2.Text = Convert.ToString(th2);
+            slideSize.Text = Convert.ToString(size_of_slide);
             if (cnt < 2)
             {
                 canny_frame[cnt] = frame.Canny(th1, th2);
@@ -174,19 +202,24 @@ namespace cam2
                                    edges[(i + 1) % edges.Length].GetExteriorAngleDegree(edges[i]));
                                 if (angle >= 60 || angle <= 120)
                                 {
-                                    isSlide = true;
+                                    isRectangle = true;
                                     break;
                                 }
                             }
                             #endregion
-                            if (isSlide)
+                            if (isRectangle)
                             {
-                                Slide_Size.Text = Convert.ToString(size_of_slide);
+                                slideSize.Text = Convert.ToString(size_of_slide);
                                 tempbox = currentContour.GetMinAreaRect();
-                                Image<Bgr, Byte> RectangleImage = frame;
-                                RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
-                                imageBox3.Image = RectangleImage;
-                                break;
+                                float tempboxp = tempbox.size.Width/tempbox.size.Height;
+                                if(tempboxp>2.7&&tempboxp<3.3)
+                                {
+                                    Image<Bgr, Byte> RectangleImage = frame;
+                                    RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
+                                    imageBox3.Image = RectangleImage;
+                                    isSlide = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -208,9 +241,11 @@ namespace cam2
                     if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
                     {
                         tempbox = currentContour.GetMinAreaRect();
-                        roi = tempbox.MinAreaRect();
-                        if(roi.Width>=10 && roi.Height>=10)
+                        
+                        if(tempbox.size.Height>=10 && tempbox.size.Width>=10 &&
+                            tempbox.center.X > slide.Width*0.17 && tempbox.center.X < slide.Width * 0.83)
                         {
+                            roi = tempbox.MinAreaRect();
                             Image<Bgr, Byte> RectangleImage = slide_img;
                             RectangleImage.Draw(tempbox, new Bgr(Color.Blue), 2);
                             imageBox4.Image = RectangleImage;
@@ -642,6 +677,29 @@ namespace cam2
                     ampChoose = true;
                     break;
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            startFlag = true;
+        }
+
+        private void canThBar1_Scroll(object sender, EventArgs e)
+        {
+            th1 = canThBar1.Value;
+            cannyBox1.Text = Convert.ToString(th1);
+        }
+
+        private void canThBar2_Scroll(object sender, EventArgs e)
+        {
+            th2 = canThBar2.Value;
+            cannyBox2.Text = Convert.ToString(th2);
+        }
+
+        private void slideSizeBar_Scroll(object sender, EventArgs e)
+        {
+            size_of_slide = slideSizeBar.Value;
+            slideSize.Text = Convert.ToString(size_of_slide);
         }
     }
 }

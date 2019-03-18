@@ -32,16 +32,16 @@
             this.imageBox1 = new Emgu.CV.UI.ImageBox();
             this.imageBox2 = new Emgu.CV.UI.ImageBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.cannybox1 = new System.Windows.Forms.TextBox();
+            this.cannyBox1 = new System.Windows.Forms.TextBox();
             this.canny_th_up1 = new System.Windows.Forms.Button();
             this.canny_th_down1 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.cannybox2 = new System.Windows.Forms.TextBox();
+            this.cannyBox2 = new System.Windows.Forms.TextBox();
             this.canny_th_up2 = new System.Windows.Forms.Button();
             this.canny_th_down2 = new System.Windows.Forms.Button();
             this.imageBox3 = new Emgu.CV.UI.ImageBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.Slide_Size = new System.Windows.Forms.TextBox();
+            this.slideSize = new System.Windows.Forms.TextBox();
             this.Slide_Size_Up = new System.Windows.Forms.Button();
             this.Slide_Size_Down = new System.Windows.Forms.Button();
             this.imageBox4 = new Emgu.CV.UI.ImageBox();
@@ -51,10 +51,17 @@
             this.button2 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.canThBar1 = new System.Windows.Forms.TrackBar();
+            this.canThBar2 = new System.Windows.Forms.TrackBar();
+            this.slideSizeBar = new System.Windows.Forms.TrackBar();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.canThBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.canThBar2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.slideSizeBar)).BeginInit();
             this.SuspendLayout();
             // 
             // imageBox1
@@ -76,27 +83,27 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("宋体", 20F);
+            this.label1.Font = new System.Drawing.Font("宋体", 12F);
             this.label1.Location = new System.Drawing.Point(12, 516);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(287, 34);
+            this.label1.Size = new System.Drawing.Size(169, 20);
             this.label1.TabIndex = 3;
             this.label1.Text = "Canny\'s Thresh1:";
             // 
-            // cannybox1
+            // cannyBox1
             // 
-            this.cannybox1.Font = new System.Drawing.Font("宋体", 20F);
-            this.cannybox1.Location = new System.Drawing.Point(324, 513);
-            this.cannybox1.Name = "cannybox1";
-            this.cannybox1.Size = new System.Drawing.Size(113, 46);
-            this.cannybox1.TabIndex = 4;
+            this.cannyBox1.Font = new System.Drawing.Font("宋体", 12F);
+            this.cannyBox1.Location = new System.Drawing.Point(186, 513);
+            this.cannyBox1.Name = "cannyBox1";
+            this.cannyBox1.Size = new System.Drawing.Size(113, 30);
+            this.cannyBox1.TabIndex = 4;
             // 
             // canny_th_up1
             // 
-            this.canny_th_up1.Font = new System.Drawing.Font("宋体", 15F);
-            this.canny_th_up1.Location = new System.Drawing.Point(479, 519);
+            this.canny_th_up1.Font = new System.Drawing.Font("宋体", 12F);
+            this.canny_th_up1.Location = new System.Drawing.Point(328, 511);
             this.canny_th_up1.Name = "canny_th_up1";
-            this.canny_th_up1.Size = new System.Drawing.Size(90, 40);
+            this.canny_th_up1.Size = new System.Drawing.Size(60, 30);
             this.canny_th_up1.TabIndex = 5;
             this.canny_th_up1.Text = "up";
             this.canny_th_up1.UseVisualStyleBackColor = true;
@@ -104,10 +111,10 @@
             // 
             // canny_th_down1
             // 
-            this.canny_th_down1.Font = new System.Drawing.Font("宋体", 15F);
-            this.canny_th_down1.Location = new System.Drawing.Point(592, 519);
+            this.canny_th_down1.Font = new System.Drawing.Font("宋体", 12F);
+            this.canny_th_down1.Location = new System.Drawing.Point(394, 511);
             this.canny_th_down1.Name = "canny_th_down1";
-            this.canny_th_down1.Size = new System.Drawing.Size(90, 40);
+            this.canny_th_down1.Size = new System.Drawing.Size(60, 30);
             this.canny_th_down1.TabIndex = 6;
             this.canny_th_down1.Text = "down";
             this.canny_th_down1.UseVisualStyleBackColor = true;
@@ -116,27 +123,27 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("宋体", 20F);
-            this.label2.Location = new System.Drawing.Point(12, 594);
+            this.label2.Font = new System.Drawing.Font("宋体", 12F);
+            this.label2.Location = new System.Drawing.Point(11, 580);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(287, 34);
+            this.label2.Size = new System.Drawing.Size(169, 20);
             this.label2.TabIndex = 7;
             this.label2.Text = "Canny\'s Thresh2:";
             // 
-            // cannybox2
+            // cannyBox2
             // 
-            this.cannybox2.Font = new System.Drawing.Font("宋体", 20F);
-            this.cannybox2.Location = new System.Drawing.Point(324, 594);
-            this.cannybox2.Name = "cannybox2";
-            this.cannybox2.Size = new System.Drawing.Size(113, 46);
-            this.cannybox2.TabIndex = 8;
+            this.cannyBox2.Font = new System.Drawing.Font("宋体", 12F);
+            this.cannyBox2.Location = new System.Drawing.Point(186, 577);
+            this.cannyBox2.Name = "cannyBox2";
+            this.cannyBox2.Size = new System.Drawing.Size(113, 30);
+            this.cannyBox2.TabIndex = 8;
             // 
             // canny_th_up2
             // 
-            this.canny_th_up2.Font = new System.Drawing.Font("宋体", 15F);
-            this.canny_th_up2.Location = new System.Drawing.Point(479, 596);
+            this.canny_th_up2.Font = new System.Drawing.Font("宋体", 12F);
+            this.canny_th_up2.Location = new System.Drawing.Point(328, 575);
             this.canny_th_up2.Name = "canny_th_up2";
-            this.canny_th_up2.Size = new System.Drawing.Size(90, 40);
+            this.canny_th_up2.Size = new System.Drawing.Size(60, 30);
             this.canny_th_up2.TabIndex = 9;
             this.canny_th_up2.Text = "up";
             this.canny_th_up2.UseVisualStyleBackColor = true;
@@ -144,10 +151,10 @@
             // 
             // canny_th_down2
             // 
-            this.canny_th_down2.Font = new System.Drawing.Font("宋体", 15F);
-            this.canny_th_down2.Location = new System.Drawing.Point(592, 596);
+            this.canny_th_down2.Font = new System.Drawing.Font("宋体", 12F);
+            this.canny_th_down2.Location = new System.Drawing.Point(394, 575);
             this.canny_th_down2.Name = "canny_th_down2";
-            this.canny_th_down2.Size = new System.Drawing.Size(90, 40);
+            this.canny_th_down2.Size = new System.Drawing.Size(60, 30);
             this.canny_th_down2.TabIndex = 10;
             this.canny_th_down2.Text = "down";
             this.canny_th_down2.UseVisualStyleBackColor = true;
@@ -164,27 +171,27 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("宋体", 20F);
-            this.label3.Location = new System.Drawing.Point(12, 672);
+            this.label3.Font = new System.Drawing.Font("宋体", 12F);
+            this.label3.Location = new System.Drawing.Point(12, 646);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(236, 34);
+            this.label3.Size = new System.Drawing.Size(139, 20);
             this.label3.TabIndex = 12;
             this.label3.Text = "Slide\'s Size:";
             // 
-            // Slide_Size
+            // slideSize
             // 
-            this.Slide_Size.Font = new System.Drawing.Font("宋体", 20F);
-            this.Slide_Size.Location = new System.Drawing.Point(324, 669);
-            this.Slide_Size.Name = "Slide_Size";
-            this.Slide_Size.Size = new System.Drawing.Size(113, 46);
-            this.Slide_Size.TabIndex = 13;
+            this.slideSize.Font = new System.Drawing.Font("宋体", 12F);
+            this.slideSize.Location = new System.Drawing.Point(186, 643);
+            this.slideSize.Name = "slideSize";
+            this.slideSize.Size = new System.Drawing.Size(113, 30);
+            this.slideSize.TabIndex = 13;
             // 
             // Slide_Size_Up
             // 
-            this.Slide_Size_Up.Font = new System.Drawing.Font("宋体", 15F);
-            this.Slide_Size_Up.Location = new System.Drawing.Point(479, 671);
+            this.Slide_Size_Up.Font = new System.Drawing.Font("宋体", 12F);
+            this.Slide_Size_Up.Location = new System.Drawing.Point(328, 641);
             this.Slide_Size_Up.Name = "Slide_Size_Up";
-            this.Slide_Size_Up.Size = new System.Drawing.Size(90, 40);
+            this.Slide_Size_Up.Size = new System.Drawing.Size(60, 30);
             this.Slide_Size_Up.TabIndex = 14;
             this.Slide_Size_Up.Text = "up";
             this.Slide_Size_Up.UseVisualStyleBackColor = true;
@@ -192,10 +199,10 @@
             // 
             // Slide_Size_Down
             // 
-            this.Slide_Size_Down.Font = new System.Drawing.Font("宋体", 15F);
-            this.Slide_Size_Down.Location = new System.Drawing.Point(592, 672);
+            this.Slide_Size_Down.Font = new System.Drawing.Font("宋体", 12F);
+            this.Slide_Size_Down.Location = new System.Drawing.Point(394, 641);
             this.Slide_Size_Down.Name = "Slide_Size_Down";
-            this.Slide_Size_Down.Size = new System.Drawing.Size(90, 40);
+            this.Slide_Size_Down.Size = new System.Drawing.Size(60, 30);
             this.Slide_Size_Down.TabIndex = 15;
             this.Slide_Size_Down.Text = "down";
             this.Slide_Size_Down.UseVisualStyleBackColor = true;
@@ -240,7 +247,7 @@
             // button2
             // 
             this.button2.Font = new System.Drawing.Font("宋体", 12F);
-            this.button2.Location = new System.Drawing.Point(507, 856);
+            this.button2.Location = new System.Drawing.Point(592, 859);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(90, 41);
             this.button2.TabIndex = 19;
@@ -272,11 +279,53 @@
             this.comboBox1.TabIndex = 21;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
+            // button3
+            // 
+            this.button3.Font = new System.Drawing.Font("宋体", 12F);
+            this.button3.Location = new System.Drawing.Point(374, 859);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(137, 41);
+            this.button3.TabIndex = 22;
+            this.button3.Text = "开始扫描";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // canThBar1
+            // 
+            this.canThBar1.Location = new System.Drawing.Point(460, 513);
+            this.canThBar1.Name = "canThBar1";
+            this.canThBar1.Size = new System.Drawing.Size(272, 56);
+            this.canThBar1.TabIndex = 23;
+            this.canThBar1.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.canThBar1.Scroll += new System.EventHandler(this.canThBar1_Scroll);
+            // 
+            // canThBar2
+            // 
+            this.canThBar2.Location = new System.Drawing.Point(460, 575);
+            this.canThBar2.Name = "canThBar2";
+            this.canThBar2.Size = new System.Drawing.Size(272, 56);
+            this.canThBar2.TabIndex = 24;
+            this.canThBar2.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.canThBar2.Scroll += new System.EventHandler(this.canThBar2_Scroll);
+            // 
+            // slideSizeBar
+            // 
+            this.slideSizeBar.Location = new System.Drawing.Point(460, 641);
+            this.slideSizeBar.Name = "slideSizeBar";
+            this.slideSizeBar.Size = new System.Drawing.Size(272, 56);
+            this.slideSizeBar.TabIndex = 25;
+            this.slideSizeBar.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.slideSizeBar.Scroll += new System.EventHandler(this.slideSizeBar_Scroll);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1532, 1055);
+            this.Controls.Add(this.slideSizeBar);
+            this.Controls.Add(this.canThBar2);
+            this.Controls.Add(this.canThBar1);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.button2);
@@ -286,16 +335,16 @@
             this.Controls.Add(this.imageBox4);
             this.Controls.Add(this.Slide_Size_Down);
             this.Controls.Add(this.Slide_Size_Up);
-            this.Controls.Add(this.Slide_Size);
+            this.Controls.Add(this.slideSize);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.imageBox3);
             this.Controls.Add(this.canny_th_down2);
             this.Controls.Add(this.canny_th_up2);
-            this.Controls.Add(this.cannybox2);
+            this.Controls.Add(this.cannyBox2);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.canny_th_down1);
             this.Controls.Add(this.canny_th_up1);
-            this.Controls.Add(this.cannybox1);
+            this.Controls.Add(this.cannyBox1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.imageBox2);
             this.Controls.Add(this.imageBox1);
@@ -305,6 +354,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.canThBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.canThBar2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.slideSizeBar)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -315,16 +367,16 @@
         private Emgu.CV.UI.ImageBox imageBox1;
         private Emgu.CV.UI.ImageBox imageBox2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox cannybox1;
+        private System.Windows.Forms.TextBox cannyBox1;
         private System.Windows.Forms.Button canny_th_up1;
         private System.Windows.Forms.Button canny_th_down1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox cannybox2;
+        private System.Windows.Forms.TextBox cannyBox2;
         private System.Windows.Forms.Button canny_th_up2;
         private System.Windows.Forms.Button canny_th_down2;
         private Emgu.CV.UI.ImageBox imageBox3;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox Slide_Size;
+        private System.Windows.Forms.TextBox slideSize;
         private System.Windows.Forms.Button Slide_Size_Up;
         private System.Windows.Forms.Button Slide_Size_Down;
         private Emgu.CV.UI.ImageBox imageBox4;
@@ -334,6 +386,10 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.TrackBar canThBar1;
+        private System.Windows.Forms.TrackBar canThBar2;
+        private System.Windows.Forms.TrackBar slideSizeBar;
     }
 }
 
