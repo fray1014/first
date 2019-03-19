@@ -93,6 +93,7 @@ namespace cam2
             }
             else
             {
+                frame = _cameraCapture.QueryFrame();
                 canThBar1.Value = th1;
                 canThBar2.Value = th2;
                 slideSizeBar.Value = size_of_slide;
@@ -595,12 +596,11 @@ namespace cam2
         {
             JsonSerializer serializer = new JsonSerializer();
             serializer.NullValueHandling = NullValueHandling.Ignore;
-            string taskdesc = Path.Combine(filedir + ".dsc");
-            using (StreamWriter sw = new StreamWriter(taskdesc))
+            using (StreamWriter sw = new StreamWriter(filedir))
             {
                 using (JsonWriter jw = new JsonTextWriter(sw))
                 {
-                    serializer.Serialize(jw, new TaskDesc(taskdesc,
+                    serializer.Serialize(jw, new TaskDesc(filedir,
                         rectRoi, rectRoiF, rectRoiPts, rectRoiSize,
                         rectBlk, rectBlkF, rectBlkPts, rectBlkSize,
                         slideid));
@@ -611,8 +611,10 @@ namespace cam2
         private void button1_Click(object sender, EventArgs e)
         {
             SaveFileDialog fileDialog = new SaveFileDialog();
+            fileDialog.Filter = "任务描述文件（*.dsc）|*.dsc";
+            fileDialog.FilterIndex = 1;
             fileDialog.ShowDialog();
-            this.filedirBox.Text= fileDialog.FileName;
+            this.filedirBox.Text = fileDialog.FileName;
             fileDir = fileDialog.FileName;
             filedirChoose = true;
         }
