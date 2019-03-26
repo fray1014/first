@@ -45,7 +45,6 @@
             this.slideSize = new System.Windows.Forms.TextBox();
             this.Slide_Size_Up = new System.Windows.Forms.Button();
             this.Slide_Size_Down = new System.Windows.Forms.Button();
-            this.imageBox4 = new Emgu.CV.UI.ImageBox();
             this.filedir = new System.Windows.Forms.Label();
             this.filedirBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -57,10 +56,11 @@
             this.canThBar2 = new System.Windows.Forms.TrackBar();
             this.slideSizeBar = new System.Windows.Forms.TrackBar();
             this.button4 = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.canThBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.canThBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.slideSizeBar)).BeginInit();
@@ -210,19 +210,11 @@
             this.Slide_Size_Down.UseVisualStyleBackColor = true;
             this.Slide_Size_Down.Click += new System.EventHandler(this.Slide_Size_Down_Click);
             // 
-            // imageBox4
-            // 
-            this.imageBox4.Location = new System.Drawing.Point(12, 796);
-            this.imageBox4.Name = "imageBox4";
-            this.imageBox4.Size = new System.Drawing.Size(314, 226);
-            this.imageBox4.TabIndex = 2;
-            this.imageBox4.TabStop = false;
-            // 
             // filedir
             // 
             this.filedir.AutoSize = true;
             this.filedir.Font = new System.Drawing.Font("宋体", 12F);
-            this.filedir.Location = new System.Drawing.Point(14, 740);
+            this.filedir.Location = new System.Drawing.Point(8, 714);
             this.filedir.Name = "filedir";
             this.filedir.Size = new System.Drawing.Size(149, 20);
             this.filedir.TabIndex = 16;
@@ -231,14 +223,14 @@
             // filedirBox
             // 
             this.filedirBox.Font = new System.Drawing.Font("宋体", 12F);
-            this.filedirBox.Location = new System.Drawing.Point(158, 737);
+            this.filedirBox.Location = new System.Drawing.Point(158, 711);
             this.filedirBox.Name = "filedirBox";
             this.filedirBox.Size = new System.Drawing.Size(475, 30);
             this.filedirBox.TabIndex = 17;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(639, 736);
+            this.button1.Location = new System.Drawing.Point(639, 710);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(43, 31);
             this.button1.TabIndex = 18;
@@ -249,7 +241,7 @@
             // button2
             // 
             this.button2.Font = new System.Drawing.Font("宋体", 12F);
-            this.button2.Location = new System.Drawing.Point(592, 859);
+            this.button2.Location = new System.Drawing.Point(526, 756);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(90, 41);
             this.button2.TabIndex = 19;
@@ -261,7 +253,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("宋体", 12F);
-            this.label4.Location = new System.Drawing.Point(361, 796);
+            this.label4.Location = new System.Drawing.Point(12, 766);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(109, 20);
             this.label4.TabIndex = 20;
@@ -275,7 +267,7 @@
             this.comboBox1.Items.AddRange(new object[] {
             "20x",
             "40x"});
-            this.comboBox1.Location = new System.Drawing.Point(476, 793);
+            this.comboBox1.Location = new System.Drawing.Point(127, 763);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 28);
             this.comboBox1.TabIndex = 21;
@@ -284,7 +276,7 @@
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("宋体", 12F);
-            this.button3.Location = new System.Drawing.Point(374, 859);
+            this.button3.Location = new System.Drawing.Point(317, 756);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(137, 41);
             this.button3.TabIndex = 22;
@@ -322,7 +314,7 @@
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("宋体", 12F);
-            this.button4.Location = new System.Drawing.Point(374, 927);
+            this.button4.Location = new System.Drawing.Point(317, 806);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(137, 41);
             this.button4.TabIndex = 26;
@@ -330,11 +322,39 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("宋体", 12F);
+            this.label5.Location = new System.Drawing.Point(12, 816);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(109, 20);
+            this.label5.TabIndex = 27;
+            this.label5.Text = "扫描个数：";
+            // 
+            // comboBox2
+            // 
+            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox2.Font = new System.Drawing.Font("宋体", 12F);
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4"});
+            this.comboBox2.Location = new System.Drawing.Point(127, 813);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(121, 28);
+            this.comboBox2.TabIndex = 28;
+            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
+            // 
             // roiDetection
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1532, 1055);
+            this.Controls.Add(this.comboBox2);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.slideSizeBar);
             this.Controls.Add(this.canThBar2);
@@ -346,7 +366,6 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.filedirBox);
             this.Controls.Add(this.filedir);
-            this.Controls.Add(this.imageBox4);
             this.Controls.Add(this.Slide_Size_Down);
             this.Controls.Add(this.Slide_Size_Up);
             this.Controls.Add(this.slideSize);
@@ -368,7 +387,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.canThBar1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.canThBar2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.slideSizeBar)).EndInit();
@@ -394,7 +412,6 @@
         private System.Windows.Forms.TextBox slideSize;
         private System.Windows.Forms.Button Slide_Size_Up;
         private System.Windows.Forms.Button Slide_Size_Down;
-        private Emgu.CV.UI.ImageBox imageBox4;
         private System.Windows.Forms.Label filedir;
         private System.Windows.Forms.TextBox filedirBox;
         private System.Windows.Forms.Button button1;
@@ -406,6 +423,8 @@
         private System.Windows.Forms.TrackBar canThBar2;
         private System.Windows.Forms.TrackBar slideSizeBar;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox comboBox2;
     }
 }
 

@@ -27,17 +27,18 @@ namespace cam2
         private int size_of_slide = 50*180;//玻片检测大小初始化
         private int size_of_roi = 1100;//染色区域大小初始化
         private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
-        private static Rectangle roi = new Rectangle();//染色区域
-        private static Rectangle slide = new Rectangle();//玻片
+        private static int maxNum = 5;//玻片最大扫描个数
+        private static int slideNum = 0;//玻片位置
+        private static Rectangle[] roi = new Rectangle[4];//染色区域
+        private static Rectangle[] slide = new Rectangle[4];//玻片
         private Image<Bgr, Byte> slide_img;
-        private Image<Gray, Byte> slide_gray_img;
+        private Image<Gray, Byte>[] slide_gray_img=new Image<Gray, Byte>[4];
         private static bool isSlide = false;//玻片检测标志
         private static bool scanDone = false;//扫描结束标志位
         private static bool ampChoose = false;
         private static bool filedirChoose = false;
         private static bool startFlag = false;
         private string fileDir;
-        private int position = 0;//玻片位置
         private int amp = 1;//物镜倍数
 
         public static Rectangle rect1stBLK = new Rectangle(125, 115, 150, 30);
@@ -45,6 +46,7 @@ namespace cam2
         public static Rectangle rect3rdBLK = new Rectangle(925, 115, 150, 30);
         public static Rectangle rect4thBLK = new Rectangle(1325, 115, 150, 30);
         public static Rectangle[] rectsBLK = { rect1stBLK, rect2ndBLK, rect3rdBLK , rect4thBLK };
+
         public roiDetection()
         {
             InitializeComponent();
@@ -89,7 +91,8 @@ namespace cam2
             if(startFlag)
             { 
                 Slide_Detection();
-                Region_Detection();
+                for(int i=0;i<maxNum;i++)
+                    Region_Detection(i);
             }
             else
             {
@@ -161,24 +164,12 @@ namespace cam2
         {
             Stable_Frame();
             Rectangle_Detection();
-            if(isSlide)
-            {
-                slide = tempbox.MinAreaRect();//外接面积最小矩形
-                slide_img = frame.GetSubRect(slide);
-                slide_gray_img = canny_out.GetSubRect(slide);
-                imageBox4.Image = slide_img;
-                isSlide = false;
-            }
-            else
-            {
+            if(!isSlide)
                 Slide_Detection();
-            }
- 
         }
         /*矩形检测*/
         void Rectangle_Detection()
         {
-            
             using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
                 for (
                    Contour<Point> contours = canny_out.FindContours(
@@ -214,27 +205,42 @@ namespace cam2
                                 slideSize.Text = Convert.ToString(size_of_slide);
                                 tempbox = currentContour.GetMinAreaRect();
                                 float tempboxp = tempbox.size.Width/tempbox.size.Height;
-
+                                //从长宽比例判断轮廓是否为玻片
                                 if (tempboxp > 2.7 && tempboxp < 3.3 ||
                                     tempboxp > 1 / 3.3 && tempboxp < 1 / 2.7)
                                 {
                                     Image<Bgr, Byte> RectangleImage = frame;
                                     RectangleImage.Draw(tempbox, new Bgr(Color.DarkOrange), 2);
                                     imageBox3.Image = RectangleImage;
-                                    isSlide = true;
-                                    break;
+                                    slide[slideNum]= tempbox.MinAreaRect();//外接面积最小矩形
+                                    slide_gray_img[slideNum]= canny_out.GetSubRect(slide[slideNum]);
+                                    if (slideNum < maxNum)
+                                        slideNum++;
+                                    else
+                                    {
+                                        isSlide = true;
+                                        slideNum = 0;
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
                 }
         }
+        /*将输入的相对位置rectangle转化成绝对位置的rectangle*/
+        Rectangle ConvertToAbsolute(Rectangle inRoi,Rectangle inSlide)
+        {
+            int x= inSlide.X+inRoi.X;
+            int y = inSlide.Y + inRoi.Y;
+            return new Rectangle(x,y,inRoi.Width,inRoi.Height);
+        }
         /*ROI检测*/
-        void Region_Detection()
-        { 
+        void Region_Detection(int id)
+        {
             using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
                 for (
-                   Contour<Point> contours = slide_gray_img.FindContours(
+                   Contour<Point> contours = slide_gray_img[id].FindContours(
                       Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE,
                       Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST,
                       storage);
@@ -245,15 +251,17 @@ namespace cam2
                     if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
                     {
                         tempbox = currentContour.GetMinAreaRect();
-                        
+                        //保证roi在中心位置
                         if(tempbox.size.Height>=10 && tempbox.size.Width>=10 &&
-                            tempbox.center.X > slide.Width*0.17 && tempbox.center.X < slide.Width * 0.83)
+                            tempbox.center.X > slide[id].Width*0.17 && tempbox.center.X < slide[id].Width * 0.83)
                         {
-                            roi = tempbox.MinAreaRect();
-                            Image<Bgr, Byte> RectangleImage = slide_img;
-                            RectangleImage.Draw(tempbox, new Bgr(Color.Blue), 2);
-                            imageBox4.Image = RectangleImage;
-                            scanDone = true;
+                            roi[id] = tempbox.MinAreaRect();
+                            Rectangle absRoi = ConvertToAbsolute(roi[id],slide[id]);
+                            Image<Bgr, Byte> RectangleImage = frame;
+                            RectangleImage.Draw(absRoi, new Bgr(Color.Blue), 2);
+                            imageBox3.Image = RectangleImage;
+                            if (id == maxNum)
+                                scanDone = true;
                             break;
                         }
                     }
@@ -619,36 +627,44 @@ namespace cam2
             filedirChoose = true;
         }
 
+        private void CalcDsc(int id)
+        {
+            RectangleF rectFRoiRecord;
+            PointF[] rectFRoiPoints;
+            Size rectRoiSize;
+
+            RectangleF rectFBlkRecord;
+            Rectangle rectBlkRecord;
+            PointF[] rectFBlkPoints;
+            Size rectBlkSize;
+
+            string fileName=Path.Combine(fileDir+"-",Convert.ToString(id)); ;
+
+            rectFRoiRecord = RectConverter.ConvertFromDrawRect(roi[id], slide[id], id);
+            rectFRoiPoints = RectConverter.GetAllPointsByRectangleF(rectFRoiRecord, amp);
+            rectRoiSize = RectConverter.GetStepsByRectangleF(rectFRoiRecord, amp);
+
+            rectBlkRecord = rectsBLK[id];
+            rectFBlkRecord = RectConverter.ConvertFromDrawRect(rectsBLK[id], slide[id], id);
+            // Cal two Points.
+            rectFBlkPoints = new PointF[2];
+            rectFBlkPoints[0] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
+            rectFBlkPoints[1] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width * 2 / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
+            rectBlkSize = RectConverter.GetStepsByRectangleF(rectFBlkRecord, amp);
+
+            roi[id] = RectConverter.ConvertToDrawRect(roi[id], slide[id], id);
+
+            GenerateTaskDesc(fileName, roi[id], rectFRoiRecord, rectFRoiPoints, rectRoiSize,
+                            rectBlkRecord, rectFBlkRecord, rectFBlkPoints, rectBlkSize,
+                            id);
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             if(scanDone && ampChoose && filedirChoose)
             {
-                RectangleF rectFRoiRecord;
-                PointF[] rectFRoiPoints;
-                Size rectRoiSize;
-
-                RectangleF rectFBlkRecord;
-                Rectangle rectBlkRecord;
-                PointF[] rectFBlkPoints;
-                Size rectBlkSize;
-
-                rectFRoiRecord = RectConverter.ConvertFromDrawRect(roi, slide, position);
-                rectFRoiPoints = RectConverter.GetAllPointsByRectangleF(rectFRoiRecord, amp);
-                rectRoiSize = RectConverter.GetStepsByRectangleF(rectFRoiRecord, amp);
-
-                rectBlkRecord = rectsBLK[position];
-                rectFBlkRecord = RectConverter.ConvertFromDrawRect(rectsBLK[position], slide, position);
-                // Cal two Points.
-                rectFBlkPoints = new PointF[2];
-                rectFBlkPoints[0] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
-                rectFBlkPoints[1] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width * 2 / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
-                rectBlkSize = RectConverter.GetStepsByRectangleF(rectFBlkRecord, amp);
-
-                roi = RectConverter.ConvertToDrawRect(roi,slide,position);
-
-                GenerateTaskDesc(fileDir,roi, rectFRoiRecord, rectFRoiPoints, rectRoiSize,
-                                rectBlkRecord, rectFBlkRecord, rectFBlkPoints, rectBlkSize,
-                                position);
+                for (int i = 0; i < maxNum; i++)
+                    CalcDsc(i);
                 scanDone = false;
                 isSlide = false;
                 startFlag = false;
@@ -685,7 +701,12 @@ namespace cam2
 
         private void button3_Click(object sender, EventArgs e)
         {
-            startFlag = true;
+            if (maxNum == 5)
+            {
+                MessageBox.Show("请选择扫描个数", "Message");
+            }
+            else
+                startFlag = true;
         }
 
         private void canThBar1_Scroll(object sender, EventArgs e)
@@ -709,6 +730,11 @@ namespace cam2
         private void button4_Click(object sender, EventArgs e)
         {
             startFlag = false;
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            maxNum = comboBox2.SelectedIndex;
         }
     }
 }
