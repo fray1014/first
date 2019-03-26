@@ -214,7 +214,7 @@ namespace cam2
                                 slideSize.Text = Convert.ToString(size_of_slide);
                                 tempbox = currentContour.GetMinAreaRect();
                                 float tempboxp = tempbox.size.Width/tempbox.size.Height;
-
+                                //根据矩形长宽比判断玻片
                                 if (tempboxp > 2.7 && tempboxp < 3.3 ||
                                     tempboxp > 1 / 3.3 && tempboxp < 1 / 2.7)
                                 {
@@ -245,7 +245,7 @@ namespace cam2
                     if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
                     {
                         tempbox = currentContour.GetMinAreaRect();
-                        
+                        //保证roi在玻片中央位置
                         if(tempbox.size.Height>=10 && tempbox.size.Width>=10 &&
                             tempbox.center.X > slide.Width*0.17 && tempbox.center.X < slide.Width * 0.83)
                         {
