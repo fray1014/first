@@ -257,9 +257,9 @@ namespace cam2
                     if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
                     {
                         tempbox = currentContour.GetMinAreaRect();
-                        //保证roi在玻片中央位置
+                        //保证roi不会误检为标签
                         if(tempbox.size.Height>=10 && tempbox.size.Width>=10 &&
-                            tempbox.center.X > slide.Width*0.17 && tempbox.center.X < slide.Width * 0.83)
+                           tempbox.center.X < slide.Width * 0.7)
                         {
                             RoiSimilarDetection();
                             Image<Bgr, Byte> RectangleImage = slide_img;
