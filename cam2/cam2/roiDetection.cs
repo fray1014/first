@@ -27,7 +27,7 @@ namespace cam2
         private int size_of_slide = 50*180;//玻片检测大小初始化
         private int size_of_roi = 1100;//染色区域大小初始化
         private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
-        private static Rectangle roi = new Rectangle();//染色区域
+        private static List<Rectangle> roi = new List<Rectangle>();//染色区域
         private static Rectangle slide = new Rectangle();//玻片
         private Image<Bgr, Byte> slide_img;
         private Image<Gray, Byte> slide_gray_img;
@@ -249,9 +249,9 @@ namespace cam2
                         if(tempbox.size.Height>=10 && tempbox.size.Width>=10 &&
                             tempbox.center.X > slide.Width*0.17 && tempbox.center.X < slide.Width * 0.83)
                         {
-                            roi = tempbox.MinAreaRect();
+                            roi.Add(tempbox.MinAreaRect());
                             Image<Bgr, Byte> RectangleImage = slide_img;
-                            RectangleImage.Draw(tempbox, new Bgr(Color.Blue), 2);
+                            RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.Blue), 2);
                             imageBox4.Image = RectangleImage;
                             scanDone = true;
                             break;
@@ -623,6 +623,7 @@ namespace cam2
         {
             if(scanDone && ampChoose && filedirChoose)
             {
+                Rectangle[] outRoi;
                 RectangleF rectFRoiRecord;
                 PointF[] rectFRoiPoints;
                 Size rectRoiSize;
@@ -632,6 +633,7 @@ namespace cam2
                 PointF[] rectFBlkPoints;
                 Size rectBlkSize;
 
+                outRoi = roi.ToArray();
                 rectFRoiRecord = RectConverter.ConvertFromDrawRect(roi, slide, position);
                 rectFRoiPoints = RectConverter.GetAllPointsByRectangleF(rectFRoiRecord, amp);
                 rectRoiSize = RectConverter.GetStepsByRectangleF(rectFRoiRecord, amp);
