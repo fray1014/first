@@ -233,12 +233,25 @@ namespace cam2
         void RoiSimilarDetection()
         {
             if(roi.Count==0)
+            {
                 roi.Add(tempbox.MinAreaRect());
+                Image<Bgr, Byte> RectangleImage = slide_img;
+                RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.Blue), 2);
+                imageBox4.Image = RectangleImage;
+                
+            }
+                
             else
             {
                 if((Math.Pow((tempbox.MinAreaRect().X-roi[roi.Count-1].X),2)+
-                    Math.Pow((tempbox.MinAreaRect().Y - roi[roi.Count-1].Y), 2))>100)
+                    Math.Pow((tempbox.MinAreaRect().Y - roi[roi.Count-1].Y), 2))>50)
+                {
                     roi.Add(tempbox.MinAreaRect());
+                    Image<Bgr, Byte> RectangleImage = slide_img;
+                    RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.Blue), 2);
+                    imageBox4.Image = RectangleImage;
+                }
+                    
             }
         }
         /*ROI检测*/
@@ -262,9 +275,7 @@ namespace cam2
                            tempbox.center.X < slide.Width * 0.7)
                         {
                             RoiSimilarDetection();
-                            Image<Bgr, Byte> RectangleImage = slide_img;
-                            RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.Blue), 2);
-                            imageBox4.Image = RectangleImage;
+                            
                         }
                     }
                 }
