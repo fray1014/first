@@ -25,7 +25,7 @@ namespace cam2
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
         private int size_of_slide = 50*180;//玻片检测大小初始化
-        private int size_of_roi = 1100;//染色区域大小初始化
+        private int size_of_roi = 500;//染色区域大小初始化
         private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
         private static List<Rectangle> roi = new List<Rectangle>();//染色区域
         private static Rectangle slide = new Rectangle();//玻片
@@ -86,7 +86,7 @@ namespace cam2
             frame = _cameraCapture.QueryFrame();
             canny_out = frame.Convert<Gray, Byte>();
             //frame._SmoothGaussian(3); //filter out noises
-            if(startFlag)
+            if(startFlag && !scanDone)
             { 
                 Slide_Detection();
                 Region_Detection();
@@ -229,6 +229,18 @@ namespace cam2
                     }
                 }
         }
+        /*roi重复检测*/
+        void RoiSimilarDetection()
+        {
+            if(roi.Count==0)
+                roi.Add(tempbox.MinAreaRect());
+            else
+            {
+                if((Math.Pow((tempbox.MinAreaRect().X-roi[roi.Count-1].X),2)+
+                    Math.Pow((tempbox.MinAreaRect().Y - roi[roi.Count-1].Y), 2))>100)
+                    roi.Add(tempbox.MinAreaRect());
+            }
+        }
         /*ROI检测*/
         void Region_Detection()
         { 
@@ -249,15 +261,14 @@ namespace cam2
                         if(tempbox.size.Height>=10 && tempbox.size.Width>=10 &&
                             tempbox.center.X > slide.Width*0.17 && tempbox.center.X < slide.Width * 0.83)
                         {
-                            roi.Add(tempbox.MinAreaRect());
+                            RoiSimilarDetection();
                             Image<Bgr, Byte> RectangleImage = slide_img;
                             RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.Blue), 2);
                             imageBox4.Image = RectangleImage;
-                            scanDone = true;
-                            break;
                         }
                     }
                 }
+            scanDone = true;
         }
 
         private void Canny_th_up_Click(object sender, EventArgs e)
@@ -611,7 +622,7 @@ namespace cam2
         private void button1_Click(object sender, EventArgs e)
         {
             SaveFileDialog fileDialog = new SaveFileDialog();
-            fileDialog.Filter = "任务描述文件（*.dsc）|*.dsc";
+            //fileDialog.Filter = "任务描述文件（*.dsc）|*.dsc";
             fileDialog.FilterIndex = 1;
             fileDialog.ShowDialog();
             this.filedirBox.Text = fileDialog.FileName;
@@ -619,38 +630,47 @@ namespace cam2
             filedirChoose = true;
         }
 
+        void GenerateDsc(Rectangle inRec,Rectangle inSlide,int roiId,int id)
+        {
+            RectangleF rectFRoiRecord;
+            PointF[] rectFRoiPoints;
+            Size rectRoiSize;
+
+            RectangleF rectFBlkRecord;
+            Rectangle rectBlkRecord;
+            PointF[] rectFBlkPoints;
+            Size rectBlkSize;
+            string fileName = fileDir + "-roi" + Convert.ToString(roiId) + ".dsc";
+
+            rectFRoiRecord = RectConverter.ConvertFromDrawRect(inRec, inSlide, id);
+            rectFRoiPoints = RectConverter.GetAllPointsByRectangleF(rectFRoiRecord, amp);
+            rectRoiSize = RectConverter.GetStepsByRectangleF(rectFRoiRecord, amp);
+
+            rectBlkRecord = rectsBLK[id];
+            rectFBlkRecord = RectConverter.ConvertFromDrawRect(rectsBLK[id], inSlide, id);
+            // Cal two Points.
+            rectFBlkPoints = new PointF[2];
+            rectFBlkPoints[0] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
+            rectFBlkPoints[1] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width * 2 / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
+            rectBlkSize = RectConverter.GetStepsByRectangleF(rectFBlkRecord, amp);
+
+            inRec = RectConverter.ConvertToDrawRect(inRec, inSlide, id);
+
+            GenerateTaskDesc(fileName, inRec, rectFRoiRecord, rectFRoiPoints, rectRoiSize,
+                            rectBlkRecord, rectFBlkRecord, rectFBlkPoints, rectBlkSize,
+                            id);
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             if(scanDone && ampChoose && filedirChoose)
             {
-                Rectangle[] outRoi;
-                RectangleF rectFRoiRecord;
-                PointF[] rectFRoiPoints;
-                Size rectRoiSize;
-
-                RectangleF rectFBlkRecord;
-                Rectangle rectBlkRecord;
-                PointF[] rectFBlkPoints;
-                Size rectBlkSize;
-
-                outRoi = roi.ToArray();
-                rectFRoiRecord = RectConverter.ConvertFromDrawRect(roi, slide, position);
-                rectFRoiPoints = RectConverter.GetAllPointsByRectangleF(rectFRoiRecord, amp);
-                rectRoiSize = RectConverter.GetStepsByRectangleF(rectFRoiRecord, amp);
-
-                rectBlkRecord = rectsBLK[position];
-                rectFBlkRecord = RectConverter.ConvertFromDrawRect(rectsBLK[position], slide, position);
-                // Cal two Points.
-                rectFBlkPoints = new PointF[2];
-                rectFBlkPoints[0] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
-                rectFBlkPoints[1] = new PointF(rectFBlkRecord.Left - rectFBlkRecord.Width * 2 / 3, rectFBlkRecord.Top + rectFBlkRecord.Height / 2);
-                rectBlkSize = RectConverter.GetStepsByRectangleF(rectFBlkRecord, amp);
-
-                roi = RectConverter.ConvertToDrawRect(roi,slide,position);
-
-                GenerateTaskDesc(fileDir,roi, rectFRoiRecord, rectFRoiPoints, rectRoiSize,
-                                rectBlkRecord, rectFBlkRecord, rectFBlkPoints, rectBlkSize,
-                                position);
+                //另一种遍历方法
+               for(int i=0;i<roi.Count;i++)
+                {
+                    GenerateDsc(roi[i], slide, i, position);
+                }
+                
                 scanDone = false;
                 isSlide = false;
                 startFlag = false;
@@ -711,6 +731,7 @@ namespace cam2
         private void button4_Click(object sender, EventArgs e)
         {
             startFlag = false;
+            scanDone = false;
         }
     }
 }
