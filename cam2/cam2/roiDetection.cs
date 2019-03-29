@@ -88,8 +88,14 @@ namespace cam2
             //frame._SmoothGaussian(3); //filter out noises
             if(startFlag && !scanDone)
             { 
-                Slide_Detection();
-                Region_Detection();
+                SlideDetection();
+                RegionDetection();
+                if (roi.Count==0)
+                {
+                    SlideDetection();
+                    RegionDetection();
+                }
+                
             }
             else
             {
@@ -157,7 +163,7 @@ namespace cam2
             }
         }
         /*玻片检测*/
-        void Slide_Detection()
+        void SlideDetection()
         {
             Stable_Frame();
             Rectangle_Detection();
@@ -171,7 +177,7 @@ namespace cam2
             }
             else
             {
-                Slide_Detection();
+                SlideDetection();
             }
  
         }
@@ -255,7 +261,7 @@ namespace cam2
             }
         }
         /*ROI检测*/
-        void Region_Detection()
+        void RegionDetection()
         { 
             using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
                 for (
