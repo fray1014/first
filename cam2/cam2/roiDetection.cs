@@ -86,16 +86,11 @@ namespace cam2
             frame = _cameraCapture.QueryFrame();
             canny_out = frame.Convert<Gray, Byte>();
             //frame._SmoothGaussian(3); //filter out noises
-            if(startFlag && !scanDone)
-            { 
+            if(startFlag )
+            {
+                roi.Clear();
                 SlideDetection();
                 RegionDetection();
-                if (roi.Count==0)
-                {
-                    SlideDetection();
-                    RegionDetection();
-                }
-                
             }
             else
             {
@@ -249,8 +244,9 @@ namespace cam2
                 
             else
             {
+                //距离大于5pixel看作不同roi
                 if((Math.Pow((tempbox.MinAreaRect().X-roi[roi.Count-1].X),2)+
-                    Math.Pow((tempbox.MinAreaRect().Y - roi[roi.Count-1].Y), 2))>50)
+                    Math.Pow((tempbox.MinAreaRect().Y - roi[roi.Count-1].Y), 2))>25)
                 {
                     roi.Add(tempbox.MinAreaRect());
                     Image<Bgr, Byte> RectangleImage = slide_img;
@@ -259,6 +255,41 @@ namespace cam2
                 }
                     
             }
+        }
+        /*快速排序*/
+        void QuickSort(ref List<Rectangle> inRec,int low,int high)
+        {
+            if(low>=high)
+                return;
+            int i = low;
+            int j = high + 1;
+            int key = inRec[low].X;
+            while(true)
+            {
+                /*从右向左找比key小的值*/
+                while (inRec[--j].X > key)
+                {
+                    if (j == low)
+                        break;
+                }
+                /*从左向右找比key大的值*/
+                while (inRec[++i].X < key)
+                {
+                    if (i == high)
+                        break;
+                }
+                if (i >= j) break;
+                /*交换i,j对应的值*/
+                Rectangle temp = inRec[i];
+                inRec[i] = inRec[j];
+                inRec[j] = temp;
+            }
+            Rectangle temp2 = inRec[low];
+            inRec[low] = inRec[j];
+            inRec[j] = temp2;
+            QuickSort(ref inRec, low, j - 1);
+            QuickSort(ref inRec, j + 1, high);
+
         }
         /*ROI检测*/
         void RegionDetection()
@@ -276,16 +307,26 @@ namespace cam2
                     if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
                     {
                         tempbox = currentContour.GetMinAreaRect();
-                        //保证roi不会误检为标签
-                        if(tempbox.size.Height>=10 && tempbox.size.Width>=10 &&
-                           tempbox.center.X < slide.Width * 0.7)
+                        //保证不会把标签和其他东西误检为roi
+                        if(tempbox.size.Height>=8 && tempbox.size.Width>=8 &&
+                           tempbox.center.X < slide.Width * 0.6)
                         {
                             RoiSimilarDetection();
                             
                         }
                     }
                 }
-            scanDone = true;
+            if (roi.Count == 0)
+            {
+                SlideDetection();
+                RegionDetection();
+            }
+            else
+            {
+                QuickSort(ref roi,0,roi.Count-1);
+                scanDone = true;
+            }
+                
         }
 
         private void Canny_th_up_Click(object sender, EventArgs e)
@@ -682,12 +723,12 @@ namespace cam2
         {
             if(scanDone && ampChoose && filedirChoose)
             {
-                //另一种遍历方法
+               
                for(int i=0;i<roi.Count;i++)
                 {
                     GenerateDsc(roi[i], slide, i, position);
                 }
-                
+                roi.Clear();
                 scanDone = false;
                 isSlide = false;
                 startFlag = false;
@@ -748,7 +789,6 @@ namespace cam2
         private void button4_Click(object sender, EventArgs e)
         {
             startFlag = false;
-            scanDone = false;
         }
     }
 }
