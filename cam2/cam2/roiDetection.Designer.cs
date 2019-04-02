@@ -45,7 +45,6 @@
             this.slideSize = new System.Windows.Forms.TextBox();
             this.Slide_Size_Up = new System.Windows.Forms.Button();
             this.Slide_Size_Down = new System.Windows.Forms.Button();
-            this.imageBox4 = new Emgu.CV.UI.ImageBox();
             this.filedir = new System.Windows.Forms.Label();
             this.filedirBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -59,13 +58,18 @@
             this.button4 = new System.Windows.Forms.Button();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.roiSizeBar = new System.Windows.Forms.TrackBar();
+            this.roiSizeDown = new System.Windows.Forms.Button();
+            this.roiSizeUp = new System.Windows.Forms.Button();
+            this.roiSize = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.canThBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.canThBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.slideSizeBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.roiSizeBar)).BeginInit();
             this.SuspendLayout();
             // 
             // imageBox1
@@ -176,7 +180,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("宋体", 12F);
-            this.label3.Location = new System.Drawing.Point(12, 646);
+            this.label3.Location = new System.Drawing.Point(12, 640);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(139, 20);
             this.label3.TabIndex = 12;
@@ -185,7 +189,7 @@
             // slideSize
             // 
             this.slideSize.Font = new System.Drawing.Font("宋体", 12F);
-            this.slideSize.Location = new System.Drawing.Point(186, 643);
+            this.slideSize.Location = new System.Drawing.Point(186, 637);
             this.slideSize.Name = "slideSize";
             this.slideSize.Size = new System.Drawing.Size(113, 30);
             this.slideSize.TabIndex = 13;
@@ -193,7 +197,7 @@
             // Slide_Size_Up
             // 
             this.Slide_Size_Up.Font = new System.Drawing.Font("宋体", 12F);
-            this.Slide_Size_Up.Location = new System.Drawing.Point(328, 641);
+            this.Slide_Size_Up.Location = new System.Drawing.Point(328, 635);
             this.Slide_Size_Up.Name = "Slide_Size_Up";
             this.Slide_Size_Up.Size = new System.Drawing.Size(60, 30);
             this.Slide_Size_Up.TabIndex = 14;
@@ -204,7 +208,7 @@
             // Slide_Size_Down
             // 
             this.Slide_Size_Down.Font = new System.Drawing.Font("宋体", 12F);
-            this.Slide_Size_Down.Location = new System.Drawing.Point(394, 641);
+            this.Slide_Size_Down.Location = new System.Drawing.Point(394, 635);
             this.Slide_Size_Down.Name = "Slide_Size_Down";
             this.Slide_Size_Down.Size = new System.Drawing.Size(60, 30);
             this.Slide_Size_Down.TabIndex = 15;
@@ -212,19 +216,11 @@
             this.Slide_Size_Down.UseVisualStyleBackColor = true;
             this.Slide_Size_Down.Click += new System.EventHandler(this.Slide_Size_Down_Click);
             // 
-            // imageBox4
-            // 
-            this.imageBox4.Location = new System.Drawing.Point(12, 796);
-            this.imageBox4.Name = "imageBox4";
-            this.imageBox4.Size = new System.Drawing.Size(314, 226);
-            this.imageBox4.TabIndex = 2;
-            this.imageBox4.TabStop = false;
-            // 
             // filedir
             // 
             this.filedir.AutoSize = true;
             this.filedir.Font = new System.Drawing.Font("宋体", 12F);
-            this.filedir.Location = new System.Drawing.Point(14, 740);
+            this.filedir.Location = new System.Drawing.Point(13, 776);
             this.filedir.Name = "filedir";
             this.filedir.Size = new System.Drawing.Size(149, 20);
             this.filedir.TabIndex = 16;
@@ -233,14 +229,14 @@
             // filedirBox
             // 
             this.filedirBox.Font = new System.Drawing.Font("宋体", 12F);
-            this.filedirBox.Location = new System.Drawing.Point(158, 737);
+            this.filedirBox.Location = new System.Drawing.Point(157, 773);
             this.filedirBox.Name = "filedirBox";
             this.filedirBox.Size = new System.Drawing.Size(475, 30);
             this.filedirBox.TabIndex = 17;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(639, 736);
+            this.button1.Location = new System.Drawing.Point(638, 772);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(43, 31);
             this.button1.TabIndex = 18;
@@ -251,7 +247,7 @@
             // button2
             // 
             this.button2.Font = new System.Drawing.Font("宋体", 12F);
-            this.button2.Location = new System.Drawing.Point(561, 888);
+            this.button2.Location = new System.Drawing.Point(513, 822);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(90, 41);
             this.button2.TabIndex = 19;
@@ -263,7 +259,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("宋体", 12F);
-            this.label4.Location = new System.Drawing.Point(361, 796);
+            this.label4.Location = new System.Drawing.Point(14, 832);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(109, 20);
             this.label4.TabIndex = 20;
@@ -277,16 +273,16 @@
             this.comboBox1.Items.AddRange(new object[] {
             "20x",
             "40x"});
-            this.comboBox1.Location = new System.Drawing.Point(476, 793);
+            this.comboBox1.Location = new System.Drawing.Point(130, 829);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 28);
+            this.comboBox1.Size = new System.Drawing.Size(120, 28);
             this.comboBox1.TabIndex = 21;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("宋体", 12F);
-            this.button3.Location = new System.Drawing.Point(365, 888);
+            this.button3.Location = new System.Drawing.Point(317, 822);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(137, 41);
             this.button3.TabIndex = 22;
@@ -314,7 +310,7 @@
             // 
             // slideSizeBar
             // 
-            this.slideSizeBar.Location = new System.Drawing.Point(460, 641);
+            this.slideSizeBar.Location = new System.Drawing.Point(460, 635);
             this.slideSizeBar.Name = "slideSizeBar";
             this.slideSizeBar.Size = new System.Drawing.Size(272, 56);
             this.slideSizeBar.TabIndex = 25;
@@ -324,7 +320,7 @@
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("宋体", 12F);
-            this.button4.Location = new System.Drawing.Point(365, 958);
+            this.button4.Location = new System.Drawing.Point(317, 870);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(137, 41);
             this.button4.TabIndex = 26;
@@ -342,9 +338,9 @@
             "2",
             "3",
             "4"});
-            this.comboBox2.Location = new System.Drawing.Point(476, 841);
+            this.comboBox2.Location = new System.Drawing.Point(130, 877);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(121, 28);
+            this.comboBox2.Size = new System.Drawing.Size(120, 28);
             this.comboBox2.TabIndex = 27;
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
@@ -352,17 +348,71 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("宋体", 12F);
-            this.label5.Location = new System.Drawing.Point(361, 844);
+            this.label5.Location = new System.Drawing.Point(14, 880);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(109, 20);
             this.label5.TabIndex = 28;
             this.label5.Text = "扫描个数：";
+            // 
+            // roiSizeBar
+            // 
+            this.roiSizeBar.Location = new System.Drawing.Point(460, 697);
+            this.roiSizeBar.Name = "roiSizeBar";
+            this.roiSizeBar.Size = new System.Drawing.Size(272, 56);
+            this.roiSizeBar.TabIndex = 33;
+            this.roiSizeBar.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.roiSizeBar.Scroll += new System.EventHandler(this.roiSizeBar_Scroll);
+            // 
+            // roiSizeDown
+            // 
+            this.roiSizeDown.Font = new System.Drawing.Font("宋体", 12F);
+            this.roiSizeDown.Location = new System.Drawing.Point(394, 697);
+            this.roiSizeDown.Name = "roiSizeDown";
+            this.roiSizeDown.Size = new System.Drawing.Size(60, 30);
+            this.roiSizeDown.TabIndex = 32;
+            this.roiSizeDown.Text = "down";
+            this.roiSizeDown.UseVisualStyleBackColor = true;
+            this.roiSizeDown.Click += new System.EventHandler(this.roiSizeDown_Click);
+            // 
+            // roiSizeUp
+            // 
+            this.roiSizeUp.Font = new System.Drawing.Font("宋体", 12F);
+            this.roiSizeUp.Location = new System.Drawing.Point(328, 697);
+            this.roiSizeUp.Name = "roiSizeUp";
+            this.roiSizeUp.Size = new System.Drawing.Size(60, 30);
+            this.roiSizeUp.TabIndex = 31;
+            this.roiSizeUp.Text = "up";
+            this.roiSizeUp.UseVisualStyleBackColor = true;
+            this.roiSizeUp.Click += new System.EventHandler(this.roiSizeUp_Click);
+            // 
+            // roiSize
+            // 
+            this.roiSize.Font = new System.Drawing.Font("宋体", 12F);
+            this.roiSize.Location = new System.Drawing.Point(186, 699);
+            this.roiSize.Name = "roiSize";
+            this.roiSize.Size = new System.Drawing.Size(113, 30);
+            this.roiSize.TabIndex = 30;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("宋体", 12F);
+            this.label6.Location = new System.Drawing.Point(12, 702);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(119, 20);
+            this.label6.TabIndex = 29;
+            this.label6.Text = "Roi\'s Size:";
             // 
             // roiDetection
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1532, 1055);
+            this.Controls.Add(this.roiSizeBar);
+            this.Controls.Add(this.roiSizeDown);
+            this.Controls.Add(this.roiSizeUp);
+            this.Controls.Add(this.roiSize);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.button4);
@@ -376,7 +426,6 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.filedirBox);
             this.Controls.Add(this.filedir);
-            this.Controls.Add(this.imageBox4);
             this.Controls.Add(this.Slide_Size_Down);
             this.Controls.Add(this.Slide_Size_Up);
             this.Controls.Add(this.slideSize);
@@ -398,10 +447,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.canThBar1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.canThBar2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.slideSizeBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.roiSizeBar)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -424,7 +473,6 @@
         private System.Windows.Forms.TextBox slideSize;
         private System.Windows.Forms.Button Slide_Size_Up;
         private System.Windows.Forms.Button Slide_Size_Down;
-        private Emgu.CV.UI.ImageBox imageBox4;
         private System.Windows.Forms.Label filedir;
         private System.Windows.Forms.TextBox filedirBox;
         private System.Windows.Forms.Button button1;
@@ -438,6 +486,11 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TrackBar roiSizeBar;
+        private System.Windows.Forms.Button roiSizeDown;
+        private System.Windows.Forms.Button roiSizeUp;
+        private System.Windows.Forms.TextBox roiSize;
+        private System.Windows.Forms.Label label6;
     }
 }
 
