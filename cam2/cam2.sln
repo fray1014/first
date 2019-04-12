@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cam2", "cam2\cam2.csproj", "{14A95C63-1668-4C47-BDBC-FFD2C7714973}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoiDetection", "cam2\RoiDetection.csproj", "{14A95C63-1668-4C47-BDBC-FFD2C7714973}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "drawRect", "drawRect\drawRect\drawRect.csproj", "{103B21E5-8887-45FE-80E6-4645522394AC}"
 EndProject

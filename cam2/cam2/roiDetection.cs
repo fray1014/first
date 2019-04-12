@@ -24,8 +24,10 @@ namespace cam2
         static int cnt = 0;//消抖计数器
         static int th1 = 5;//canny第一阈值初始化
         static int th2 = 70;//canny第二阈值初始化
-        private int size_of_slide = 50*180;//玻片检测大小初始化
-        private int size_of_roi = 300;//染色区域大小初始化
+        private int size_of_slide_max = 80 * 200;//玻片大小上界
+        private int size_of_slide_min = 40*160;//玻片大小下界
+        private int size_of_roi_max = 200;//染色区域大小上界
+        private int size_of_roi_min = 100;//染色区域大小下界
         private MCvBox2D tempbox = new MCvBox2D();//用于标注玻片位置
         private static List<Rectangle> s1Roi = new List<Rectangle>();
         private static List<Rectangle> s2Roi = new List<Rectangle>();
@@ -41,9 +43,10 @@ namespace cam2
         private static bool filedirChoose = false;
         private static bool startFlag = false;
         private string fileDir;
-        private int amp = 1;//物镜倍数
-        private int slideNum = 5;//玻片扫描数
+        private static int amp = 1;//物镜倍数
+        private static int slideNum = 5;//玻片扫描数
         private static int slideIndex = 0;
+        private static int roiNum = 0;//ROI个数
         public static Rectangle rect1stBLK = new Rectangle(125, 115, 150, 30);
         public static Rectangle rect2ndBLK = new Rectangle(525, 115, 150, 30);
         public static Rectangle rect3rdBLK = new Rectangle(925, 115, 150, 30);
@@ -72,13 +75,33 @@ namespace cam2
                 canThBar2.Minimum = 0;
                 canThBar2.SmallChange = 2;
 
-                slideSizeBar.Maximum = 100 * 100;
-                slideSizeBar.Minimum = 1000;
-                slideSizeBar.SmallChange = 500;
+                slideMinSizeBar.Maximum = 100 * 100;
+                slideMinSizeBar.Minimum = 1000;
+                slideMinSizeBar.SmallChange = 500;
+                slideMaxSizeBar.Maximum = 150 * 250;
+                slideMaxSizeBar.Minimum = 1000;
+                slideMaxSizeBar.SmallChange = 500;
 
-                roiSizeBar.Maximum = 50 * 50;
-                roiSizeBar.Minimum = 1;
-                roiSizeBar.SmallChange = 10;
+                roiMinSizeBar.Maximum = 50 * 50;
+                roiMinSizeBar.Minimum = 1;
+                roiMinSizeBar.SmallChange = 10;
+                roiMaxSizeBar.Maximum = 50 * 50;
+                roiMaxSizeBar.Minimum = 1;
+                roiMaxSizeBar.SmallChange = 10;
+
+                canThBar1.Value = th1;
+                canThBar2.Value = th2;
+                slideMinSizeBar.Value = size_of_slide_min;
+                slideMaxSizeBar.Value = size_of_slide_max;
+                roiMinSizeBar.Value = size_of_roi_min;
+                roiMaxSizeBar.Value = size_of_roi_max;
+
+                cannyBox1.Text = Convert.ToString(th1);
+                cannyBox2.Text = Convert.ToString(th2);
+                slideMinSize.Text = Convert.ToString(size_of_slide_min);
+                slideMaxSize.Text = Convert.ToString(size_of_slide_max);
+                roiMinSize.Text = Convert.ToString(size_of_roi_min);
+                roiMaxSize.Text = Convert.ToString(size_of_roi_max);
             }
             catch (Exception e)
             {
@@ -95,23 +118,21 @@ namespace cam2
             //frame._SmoothGaussian(3); //filter out noises
             if(startFlag)
             {
+                
                 for (int i = 0; i < slideNum; i++)
                     roi[i].Clear();
                 SlideDetection();
-                for (int i = 0; i < slideNum; i++)
-                    RegionDetection(i);
+                if(isSlide)
+                {
+                    for (int i = 0; i < slideNum; i++)
+                        RegionDetection(i);
+                }
+                
             }
             else
             {
-                frame = _cameraCapture.QueryFrame();
-                canThBar1.Value = th1;
-                canThBar2.Value = th2;
-                slideSizeBar.Value = size_of_slide;
-                imageBox1.Image = frame;
-                cannyBox1.Text = Convert.ToString(th1);
-                cannyBox2.Text = Convert.ToString(th2);
-                slideSize.Text = Convert.ToString(size_of_slide);
-                roiSize.Text = Convert.ToString(size_of_roi);
+                Stable_Frame();
+                
             }
         }
         /*动态消抖*/
@@ -119,10 +140,6 @@ namespace cam2
         {
             frame = _cameraCapture.QueryFrame();
             imageBox1.Image = frame;
-            cannyBox1.Text = Convert.ToString(th1);
-            cannyBox2.Text = Convert.ToString(th2);
-            slideSize.Text = Convert.ToString(size_of_slide);
-            roiSize.Text = Convert.ToString(size_of_roi);
             if (cnt < 2)
             {
                 canny_frame[cnt] = frame.Canny(th1, th2);
@@ -173,19 +190,17 @@ namespace cam2
         {
             Stable_Frame();
             Rectangle_Detection();
-            if(!isSlide)
+            if (!isSlide)
                 SlideDetection();
+                //startFlag = false;
         }
         void SlideSimilarDetection()
         {
             if(slideIndex==0)
             {
-                slide[slideIndex] = tempbox.MinAreaRect();//外接面积最小矩形
+                slide[slideIndex]=tempbox.MinAreaRect();//外接面积最小矩形
                 slide_img[slideIndex] = frame.GetSubRect(slide[slideIndex]);
                 slide_gray_img[slideIndex] = canny_out.GetSubRect(slide[slideIndex]);
-                Image<Bgr, Byte> RectangleImage = frame;
-                RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.DarkOrange), 2);
-                imageBox3.Image = frame;
                 slideIndex++;
             }
             //距离大于40pixel看作不同slide
@@ -195,9 +210,6 @@ namespace cam2
                 slide[slideIndex] = tempbox.MinAreaRect();//外接面积最小矩形
                 slide_img[slideIndex] = frame.GetSubRect(slide[slideIndex]);
                 slide_gray_img[slideIndex] = canny_out.GetSubRect(slide[slideIndex]);
-                Image<Bgr, Byte> RectangleImage = frame;
-                RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.DarkOrange), 2);
-                imageBox3.Image = frame;
                 slideIndex++;
             }
 
@@ -216,7 +228,8 @@ namespace cam2
                    contours = contours.HNext)
                 {
                     Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);//逼近多边形曲线
-                    if (currentContour.Area > size_of_slide  && isSlide == false) //only consider contours with area greater than 250
+                    if (currentContour.Area > size_of_slide_min  &&
+                        currentContour.Area < size_of_slide_max && isSlide == false) //only consider contours with area greater than 250
                     {
                         if (currentContour.Total == 4) //The contour has 4 vertices(顶点).
                         {
@@ -238,16 +251,16 @@ namespace cam2
                             #endregion
                             if (isRectangle)
                             {
-                                slideSize.Text = Convert.ToString(size_of_slide);
+                                slideMinSize.Text = Convert.ToString(size_of_slide_min);
                                 tempbox = currentContour.GetMinAreaRect();
                                 float tempboxp = tempbox.size.Width/tempbox.size.Height;
                                 //根据矩形长宽比判断玻片
-                                if (tempboxp > 2.7 && tempboxp < 3.3 ||
-                                    tempboxp > 1 / 3.3 && tempboxp < 1 / 2.7)
+                                if (tempboxp > 2.7 && tempboxp < 3.3 )
                                 {
                                     SlideSimilarDetection();
                                     if(slideIndex==slideNum)
                                     {
+                                        QuickSort(ref slide, 0, slideNum-1);
                                         isSlide = true;
                                         break;
                                     }
@@ -281,6 +294,7 @@ namespace cam2
                 roi[id].Add(tempbox.MinAreaRect());
                 Image<Bgr, Byte> RectangleImage = slide_img[id];
                 RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.Blue), 2);
+                frame.Draw(slide[id], new Bgr(Color.DarkOrange), 2);
                 imageBox3.Image = frame;
             }
             //距离大于5pixel看作不同roi    
@@ -290,11 +304,12 @@ namespace cam2
                 roi[id].Add(tempbox.MinAreaRect());
                 Image<Bgr, Byte> RectangleImage = slide_img[id];
                 RectangleImage.Draw(tempbox.MinAreaRect(), new Bgr(Color.Blue), 2);
+                frame.Draw(slide[id], new Bgr(Color.DarkOrange), 2);
                 imageBox3.Image = frame;   
             }
         }
         /// <summary>
-        /// 快速排序
+        /// 快速排序(根据横坐标)
         /// </summary>
         /// <param name="inRec">输入矩形列表</param>
         /// <param name="low">下标起点</param>
@@ -333,10 +348,46 @@ namespace cam2
             QuickSort(ref inRec, j + 1, high);
 
         }
+
+        void QuickSort(ref Rectangle[] inRec, int low, int high)
+        {
+            if (low >= high)
+                return;
+            int i = low;
+            int j = high + 1;
+            int key = inRec[low].X;
+            while (true)
+            {
+                /*从右向左找比key小的值*/
+                while (inRec[--j].X > key)
+                {
+                    if (j == low)
+                        break;
+                }
+                /*从左向右找比key大的值*/
+                while (inRec[++i].X < key)
+                {
+                    if (i == high)
+                        break;
+                }
+                if (i >= j) break;
+                /*交换i,j对应的值*/
+                Rectangle temp = inRec[i];
+                inRec[i] = inRec[j];
+                inRec[j] = temp;
+            }
+            Rectangle temp2 = inRec[low];
+            inRec[low] = inRec[j];
+            inRec[j] = temp2;
+            QuickSort(ref inRec, low, j - 1);
+            QuickSort(ref inRec, j + 1, high);
+
+        }
         /*ROI检测*/
         void RegionDetection(int id)
-        { 
-            using (MemStorage storage = new MemStorage()) //allocate storage for contour(轮廓) approximation
+        {
+            //allocate storage for contour(轮廓) approximation
+            using (MemStorage storage = new MemStorage())
                 for (
                    Contour<Point> contours = slide_gray_img[id].FindContours(
                       Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE,
@@ -345,16 +396,21 @@ namespace cam2
                    contours != null;
                    contours = contours.HNext)
                 {
-                    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);//逼近多边形曲线
-                    if (currentContour.Area < size_of_roi) //only consider contours with area greater than 250
+                    //逼近多边形曲线
+                    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.05, storage);
+                    //only consider contours with area greater than 250
+                    if (size_of_roi_min < currentContour.Area && 
+                        currentContour.Area < size_of_roi_max) 
                     {
                         tempbox = currentContour.GetMinAreaRect();
                         //保证不会把标签和其他东西误检为roi
-                        if(tempbox.size.Height>=6 && tempbox.size.Width>=6 &&
-                           tempbox.center.X < slide[id].Width * 0.6
-                           && tempbox.center.X > slide[id].Width * 0.1)
+                        if(tempbox.center.X < slide[id].Width * 0.6
+                           && tempbox.center.X > slide[id].Width * 0.15)
                         {
-                            RoiSimilarDetection(id);
+                            if (roi[id].Count < roiNum)
+                                RoiSimilarDetection(id);
+                            else
+                                break;
                             
                         }
                     }
@@ -368,6 +424,7 @@ namespace cam2
             {
                 QuickSort(ref roi[id],0,roi[id].Count-1);
                 scanDone = true;
+                //startFlag = false;
             }
                 
         }
@@ -375,31 +432,43 @@ namespace cam2
         private void Canny_th_up_Click(object sender, EventArgs e)
         {
             th1+=5;
+            canThBar1.Value = th1;
+            cannyBox1.Text = Convert.ToString(th1);
         }
 
         private void Canny_th_down_Click(object sender, EventArgs e)
         {
             th1-=5;
+            canThBar1.Value = th1;
+            cannyBox1.Text = Convert.ToString(th1);
         }
 
         private void Canny_th_up2_Click(object sender, EventArgs e)
         {
             th2+=5;
+            canThBar2.Value = th2;
+            cannyBox2.Text = Convert.ToString(th2);
         }
 
         private void Canny_th_down2_Click(object sender, EventArgs e)
         {
             th2-=5;
+            canThBar2.Value = th2;
+            cannyBox2.Text = Convert.ToString(th2);
         }
 
         private void Slide_Size_Up_Click(object sender, EventArgs e)
         {
-            size_of_slide += 5;
+            size_of_slide_min += 5;
+            slideMinSizeBar.Value = size_of_slide_min;
+            slideMinSize.Text = Convert.ToString(size_of_slide_min);
         }
 
         private void Slide_Size_Down_Click(object sender, EventArgs e)
         {
-            size_of_slide -= 5;
+            size_of_slide_min -= 5;
+            slideMinSizeBar.Value = size_of_slide_min;
+            slideMinSize.Text = Convert.ToString(size_of_slide_min);
         }
 
         public class TaskDesc
@@ -783,11 +852,10 @@ namespace cam2
                 for(int i=0;i<slideNum;i++)
                     roi[i].Clear();
                 slideIndex = 0;
-                slideNum = 5;
                 scanDone = false;
                 isSlide = false;
                 startFlag = false;
-                frame = null;
+                //frame = null;
                 MessageBox.Show("扫描完成", "Message");
             }
             else if(!scanDone)
@@ -823,6 +891,8 @@ namespace cam2
         {
             if(slideNum>4)
                 MessageBox.Show("请选择扫描个数", "Message");
+            else if(roiNum==0)
+                MessageBox.Show("请选择区域个数", "Message");
             else
                 startFlag = true;
         }
@@ -841,8 +911,8 @@ namespace cam2
 
         private void slideSizeBar_Scroll(object sender, EventArgs e)
         {
-            size_of_slide = slideSizeBar.Value;
-            slideSize.Text = Convert.ToString(size_of_slide);
+            size_of_slide_min = slideMinSizeBar.Value;
+            slideMinSize.Text = Convert.ToString(size_of_slide_min);
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -861,18 +931,67 @@ namespace cam2
 
         private void roiSizeBar_Scroll(object sender, EventArgs e)
         {
-            size_of_roi = roiSizeBar.Value;
-            roiSize.Text = Convert.ToString(size_of_roi);
+            size_of_roi_max = roiMaxSizeBar.Value;
+            roiMaxSize.Text = Convert.ToString(size_of_roi_max);
         }
 
         private void roiSizeUp_Click(object sender, EventArgs e)
         {
-            size_of_roi += 5;
+            size_of_roi_max += 5;
+            roiMaxSizeBar.Value = size_of_roi_max;
+            roiMaxSize.Text = Convert.ToString(size_of_roi_max);
         }
 
         private void roiSizeDown_Click(object sender, EventArgs e)
         {
-            size_of_roi -= 5;
+            size_of_roi_max -= 5;
+            roiMaxSizeBar.Value = size_of_roi_max;
+            roiMaxSize.Text = Convert.ToString(size_of_roi_max);
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            roiNum = comboBox3.SelectedIndex + 1;
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            size_of_slide_max += 5;
+            slideMinSizeBar.Value = size_of_slide_max;
+            slideMinSize.Text = Convert.ToString(size_of_slide_max);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            size_of_slide_max -= 5;
+            slideMinSizeBar.Value = size_of_slide_max;
+            slideMinSize.Text = Convert.ToString(size_of_slide_max);
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            size_of_roi_min += 5;
+            roiMinSizeBar.Value = size_of_roi_min;
+            roiMinSize.Text = Convert.ToString(size_of_roi_min);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            size_of_roi_min -= 5;
+            roiMinSizeBar.Value = size_of_roi_min;
+            roiMinSize.Text = Convert.ToString(size_of_roi_min);
+        }
+
+        private void slideMaxSizeBar_Scroll(object sender, EventArgs e)
+        {
+            size_of_slide_max = slideMaxSizeBar.Value;
+            slideMaxSize.Text = Convert.ToString(size_of_slide_max);
+        }
+
+        private void roiMinSizeBar_Scroll(object sender, EventArgs e)
+        {
+            size_of_roi_min = roiMinSizeBar.Value;
+            roiMinSize.Text = Convert.ToString(size_of_roi_min);
         }
     }
 }
